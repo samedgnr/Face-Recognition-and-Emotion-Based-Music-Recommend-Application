@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "824783595424",
+    "firebase_url": "https://spocv-61876-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "spocv-61876",
+    "storage_bucket": "spocv-61876.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:824783595424:android:4854a4ef74c5ba4aef26c5",
+        "android_client_info": {
+          "package_name": "com.example.music_recommendation_with_emotional_analysiss"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDIZ_r_lnJuw0LVwGovqVgfGtvg0DYTBpU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
