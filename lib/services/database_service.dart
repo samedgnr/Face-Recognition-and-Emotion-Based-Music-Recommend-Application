@@ -104,20 +104,29 @@ class DatabaseService {
     await userDocumentReference.update({"spotifyToken": spotiftToken});
   }
 
-//  create playlist
+//  create songs
   addSongs(String playlistId, Map<String, dynamic> songData) async {
-    playlistCollection.doc(playlistId).collection("songs").add(songData);
+    DocumentReference documentReference = await playlistCollection
+        .doc(playlistId)
+        .collection("songs")
+        .add(songData);
+    String documentId = documentReference.id;
+
+    await documentReference.update({
+      "songId": documentId,
+    });
   }
 
 // delete playlist
   deletePlaylist(String playlistId) {
     playlistCollection.doc(playlistId).delete();
+    
   }
 
 // delete song playlist
   deleteSongPlaylist(String playlistId, String songId) {
     DocumentReference playlistRef =
-        FirebaseFirestore.instance.collection('playlist').doc(playlistId);
+        FirebaseFirestore.instance.collection('playlists').doc(playlistId);
     playlistRef.collection('songs').doc(songId).delete();
   }
 }

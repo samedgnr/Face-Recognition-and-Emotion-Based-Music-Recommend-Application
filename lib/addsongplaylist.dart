@@ -29,14 +29,14 @@ class _AddSongState extends State<AddSong> {
 
   addSong() {
     Map<String, dynamic> songData = {
-      "songName": "Dünyanın Sonuna Doğmuşum",
-      "songSinger": "Manga",
+      "songName": "Serseri",
+      "songSinger": "Teoman",
       "songIcon": "example_icon_url",
       "songDuration": "04:45",
-      "SongTrackId": "2AlPvpsWlG7dEfhfNf9qJR",
+      "SongTrackId": "3717eMglfGPYr9YKzdsiho",
       "SongAddTime": FieldValue.serverTimestamp(),
     };
 
-    DatabaseService().addSongs("WNHg12O3pIw46qM4V0qi", songData);
+    DatabaseService().addSongs("MnFqEb3yWIT1T7n5sCLI", songData);
   }
 }

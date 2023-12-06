@@ -19,6 +19,7 @@ class _MyPlaylistPageState extends State<MyPlaylistsPage> {
   Stream<QuerySnapshot>? playlist;
   String userId = "";
   String playlistName = "";
+  List<Map<String, dynamic>> playlistList = [];
 
   @override
   void initState() {
@@ -27,22 +28,35 @@ class _MyPlaylistPageState extends State<MyPlaylistsPage> {
   }
 
   gettingUserData() async {
-    await HelperFunctions.getUserNameFromSF().then((val) {
+    await HelperFunctions.getUserNameFromSF().then((val) async {
       setState(() {
         userName = val!;
         userId = "${FirebaseAuth.instance.currentUser!.uid}_$userName";
       });
-      gettingPlaylist();
+      await gettingPlaylist();
     });
   }
 
   gettingPlaylist() async {
     try {
-      DatabaseService().getPlaylists(userId).then((value) {
+      DatabaseService().getPlaylists(userId).then((value) async {
         setState(() {
           playlist = value;
         });
+        await streamtoList();
       });
+    } catch (e) {
+      print("Hata oluştu: $e");
+    }
+  }
+
+  streamtoList() async {
+    try {
+      await for (QuerySnapshot snapshot in playlist!) {
+        for (QueryDocumentSnapshot doc in snapshot.docs) {
+          playlistList.add(doc.data() as Map<String, dynamic>);
+        }
+      }
     } catch (e) {
       print("Hata oluştu: $e");
     }
@@ -126,11 +140,11 @@ class _MyPlaylistPageState extends State<MyPlaylistsPage> {
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-        showSearch(
-          context: context,
-          delegate: PlaylistSearchDelegate(playlist),
-        );
-      },
+              showSearch(
+                context: context,
+                delegate: PlaylistSearchDelegate(playlistList),
+              );
+            },
           ),
           IconButton(
             icon: const Icon(Icons.add),

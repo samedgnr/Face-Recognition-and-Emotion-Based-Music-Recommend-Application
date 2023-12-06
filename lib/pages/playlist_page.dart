@@ -109,13 +109,13 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
   String playlistName = "";
   String userName = "";
   Stream<QuerySnapshot>? playlist;
+  Stream<QuerySnapshot>? songs;
   String userId = "";
 
   @override
   void initState() {
     super.initState();
     gettingUserData();
-    getSongs();
   }
 
   gettingUserData() async {
@@ -135,19 +135,22 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
           playlist = value;
         });
       });
+      getSongs();
     } catch (e) {
       print("Hata oluştu: $e");
     }
   }
 
-  Stream<QuerySnapshot>? songs;
-
   getSongs() {
-    DatabaseService().getSongs(widget.playlistId).then((value) {
-      setState(() {
-        songs = value;
+    try {
+      DatabaseService().getSongs(widget.playlistId).then((value) {
+        setState(() {
+          songs = value;
+        });
       });
-    });
+    } catch (e) {
+      print("Hata oluştu: $e");
+    }
   }
 
   @override
@@ -202,6 +205,7 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
                             ['songDuration'],
                         "SongTrackId": snapshot.data.docs[index]['SongTrackId'],
                         "SongAddTime": snapshot.data.docs[index]['SongAddTime'],
+                        "songId": snapshot.data.docs[index]['songId'],
                       };
                       try {
                         showPopMenu(context, details.globalPosition, playlist!,
@@ -298,9 +302,9 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
                 onTap: () {
                   try {
                     DatabaseService().deleteSongPlaylist(
-                        widget.playlistId, songData["SongTrackId"]);
-                        mySnackBar(context,
-                          " ${songData["songName"]} şarkısı playlistten kaldırıldı.");
+                        widget.playlistId, songData["songId"]);
+                    mySnackBar(context,
+                        " ${songData["songName"]} şarkısı playlistten kaldırıldı.");
                     Navigator.pop(context);
                   } catch (e) {
                     Exception(e);
