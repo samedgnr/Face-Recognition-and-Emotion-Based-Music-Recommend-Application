@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../models/colors.dart' as custom_colors;
 import '../helper/helper_function.dart';
 
-
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
@@ -12,7 +11,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-   final user = FirebaseAuth.instance.currentUser!;
+  final user = FirebaseAuth.instance.currentUser!;
   String userName = "";
   String email = "";
   String number = "";
@@ -45,7 +44,14 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        
+        appBar: AppBar(
+          title: const Text(
+            "Profile",
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: custom_colors.pinkPrimary,
+          iconTheme: const IconThemeData(color: Colors.white),
+        ),
         body: SingleChildScrollView(
           child: Column(
             children: [
@@ -57,7 +63,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       CircleAvatar(
                         radius: 50,
-                        backgroundImage: AssetImage("lib/images/aa.png"),
+                        backgroundImage: AssetImage("lib/images/noPhoto.jpg"),
                       ),
                     ],
                   ),
@@ -69,14 +75,17 @@ class _ProfilePageState extends State<ProfilePage> {
                     style: TextStyle(color: custom_colors.pinkPrimary)),
               ),
               const SizedBox(
-                height: 40,
+                height: 20,
               ),
               SizedBox(
                 height: 250,
                 child: ListView(children: <Widget>[
                   ListTile(
                     leading: const Icon(Icons.person),
-                    title: Text(userName,style: TextStyle(color:custom_colors.blackSecondary),),
+                    title: Text(
+                      userName,
+                      style: TextStyle(color: custom_colors.blackSecondary),
+                    ),
                   ),
                   ListTile(
                     leading: const Icon(Icons.email),

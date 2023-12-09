@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:music_recommendation_with_emotional_analysiss/pages/home_page.dart';
-import 'package:music_recommendation_with_emotional_analysiss/pages/my_playlists_page.dart';
+import 'package:music_recommendation_with_emotional_analysiss/pages/homee_page.dart';
+import 'package:music_recommendation_with_emotional_analysiss/pages/library_page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/search_page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/settings%20page/setting_body.dart';
+import '../models/colors.dart' as custom_colors;
 
 class NavBar extends StatefulWidget {
   int finalindex;
@@ -16,9 +17,9 @@ class NavBar extends StatefulWidget {
 class _NavBarState extends State<NavBar> {
   final widgetOptions = [
     HomePage(),
-     const SearchPage(),
+    const SearchPage(),
     const MyPlaylistsPage(),
-    const SettingsPage(),
+
   ];
 
   @override
@@ -36,32 +37,27 @@ class _NavBarState extends State<NavBar> {
         elevation: 8.0,
         showSelectedLabels: true,
         unselectedItemColor: Colors.white,
-        selectedItemColor: Colors.deepPurple,
+        selectedItemColor: custom_colors.pinkPrimary,
         items: const [
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.home,
-                color: Colors.deepPurple,
+                color: Color.fromARGB(255, 109, 12, 109),
               ),
               label: "Home"),
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.search,
-                color: Colors.deepPurple,
+                color: Color.fromARGB(255, 109, 12, 109),
               ),
               label: "Search"),
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.library_books,
-                color: Colors.deepPurple,
+                color: Color.fromARGB(255, 109, 12, 109),
               ),
               label: "Your Library"),
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.settings,
-                color: Colors.deepPurple,
-              ),
-              label: "Settings"),
+          
         ],
       ),
       body: widgetOptions[widget.finalindex],

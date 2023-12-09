@@ -18,7 +18,6 @@ class _AddSongState extends State<AddSong> {
         if (snapshot.connectionState == ConnectionState.done) {
           return const Text('Playlist oluşturuldu!');
         } else if (snapshot.hasError) {
-          // Hata durumunda buraya gelir
           return Text('Hata oluştu: ${snapshot.error}');
         } else {
           return const CircularProgressIndicator();
@@ -29,15 +28,15 @@ class _AddSongState extends State<AddSong> {
 
   addSong() {
     Map<String, dynamic> songData = {
-      "songName": "Serseri",
-      "songSinger": "Teoman",
+      "songName": "Yokluğunda",
+      "songSinger": "Leyla is Band",
       "songIcon": "example_icon_url",
       "songDuration": "04:45",
-      "SongTrackId": "3717eMglfGPYr9YKzdsiho",
+      "SongTrackId": "65lvjeOHd1ZDJKtRpB0c57",
       "songisLiked": false,
       "SongAddTime": FieldValue.serverTimestamp(),
     };
     //DatabaseService().createPlaylist("samed", "B7lZKhzqfRZYdhRnu1IAlL3fols1" , "Beğenilenler");
-    DatabaseService().addSongs("L6tAdcfRGMNS3L5VbdPX", songData);
+    DatabaseService().addSongs("X5A4n8kGKTb3xQRvAwHi", songData);
   }
 }

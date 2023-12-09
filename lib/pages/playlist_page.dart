@@ -193,7 +193,6 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
               "songId": snapshot.data.docs[index]['songId'],
               "songisLiked": snapshot.data.docs[index]['songisLiked'],
             };
-
             return GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -213,8 +212,7 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
                   leading: ClipRRect(
                     borderRadius: BorderRadius.circular(6),
                     child: Image.network(
-                      "https://media.pinatafarm.com/protected/65CA2375-85F2-4AA2-97D1-499E73E0306D/79989f8e-4bfb-41e1-9ac3-65cac0c6f445-1669494507463-pfarm-with-png-watermarked.webp",
-                      //snapshot.data.docs[index]['songIcon'],
+                      snapshot.data.docs[index]['songIcon'],
                       width: 45,
                     ),
                   ),
@@ -231,8 +229,14 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          DatabaseService().updateIsLiked(widget.playlistId,
-                              snapshot.data.docs[index]['songId'], !isLiked ,userId,songData,);
+                          print(songData["songId"]);
+                          DatabaseService().updateIsLiked(
+                            widget.playlistId,
+                            snapshot.data.docs[index]['songId'],
+                            !isLiked,
+                            userId,
+                            songData,
+                          );
                           setState(() {
                             snapshot.data.docs[index]['songisLiked'] = !isLiked;
                           });
@@ -268,6 +272,75 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
     );
   }
 
+  popUpDialog(BuildContext context) {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(builder: ((context, setState) {
+            return AlertDialog(
+              title: const Text(
+                "Create a playlist",
+                textAlign: TextAlign.left,
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    onChanged: (val) {
+                      setState(() {
+                        playlistName = val;
+                      });
+                    },
+                    style: const TextStyle(color: Colors.black),
+                    decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Colors.deepPurple),
+                            borderRadius: BorderRadius.circular(20)),
+                        errorBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Colors.deepPurple),
+                            borderRadius: BorderRadius.circular(20)),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Theme.of(context).primaryColor),
+                            borderRadius: BorderRadius.circular(20))),
+                  ),
+                ],
+              ),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple),
+                  child: const Text("CANCEL"),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (playlistName != "") {
+                      DatabaseService(
+                              uid: FirebaseAuth.instance.currentUser!.uid)
+                          .createPlaylist(
+                              userName,
+                              FirebaseAuth.instance.currentUser!.uid,
+                              playlistName);
+                      Navigator.of(context).pop();
+                      mySnackBar(context, "Playlist created successfully.");
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple),
+                  child: const Text("CREATE"),
+                )
+              ],
+            );
+          }));
+        });
+  }
+
   void showPopupMenu(BuildContext context, Offset offset,
       Stream<QuerySnapshot> playlists, Map<String, dynamic> songData) {
     showModalBottomSheet(
@@ -288,31 +361,48 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
               );
             }
 
-            return ListView.builder(
-              itemCount: snapshot.data.docs.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Row(
-                    children: [
-                      Text(
-                        snapshot.data.docs[index]['playlistName'],
-                        style: const TextStyle(color: Colors.black),
-                      ),
-                    ],
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      popUpDialog(context);
+                    },
+                    child: const Text('Playlist Oluştur'),
                   ),
-                  onTap: () {
-                    try {
-                      DatabaseService().addSongs(
-                          snapshot.data.docs[index]['playlistId'], songData);
-                      mySnackBar(context,
-                          "${snapshot.data.docs[index]['playlistName']} playlistine ${songData["songName"]} şarkısı eklendi");
-                      Navigator.pop(context);
-                    } catch (e) {
-                      Exception(e);
-                    }
-                  },
-                );
-              },
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: snapshot.data.docs.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Row(
+                          children: [
+                            Text(
+                              snapshot.data.docs[index]['playlistName'],
+                              style: const TextStyle(color: Colors.black),
+                            ),
+                          ],
+                        ),
+                        onTap: () {
+                          try {
+                            DatabaseService().addSongs(
+                                snapshot.data.docs[index]['playlistId'],
+                                songData);
+                            mySnackBar(context,
+                                "${snapshot.data.docs[index]['playlistName']} playlistine ${songData["songName"]} şarkısı eklendi");
+                            Navigator.pop(context);
+                          } catch (e) {
+                            Exception(e);
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
             );
           },
         );
@@ -372,7 +462,7 @@ class _PlaylistInformation extends StatelessWidget {
         ClipRRect(
           borderRadius: BorderRadius.circular(15.0),
           child: Image.network(
-            "https://media.pinatafarm.com/protected/65CA2375-85F2-4AA2-97D1-499E73E0306D/79989f8e-4bfb-41e1-9ac3-65cac0c6f445-1669494507463-pfarm-with-png-watermarked.webp",
+            "https://community.spotify.com/t5/image/serverpage/image-id/25294i2836BD1C1A31BDF2/image-size/original?v=mpbl-1&px=-1",
             height: MediaQuery.of(context).size.height * 0.3,
             width: MediaQuery.of(context).size.height * 0.3,
             fit: BoxFit.cover,

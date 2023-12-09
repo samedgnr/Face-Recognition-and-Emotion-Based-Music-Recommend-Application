@@ -42,11 +42,13 @@ class _PlayMusicPageState extends State<PlayMusicPage> {
         music.songName = tempSongName;
         music.artistName = track.artists?.first.name ?? "";
         String? image = track.album?.images?.first.url;
+        print("samed ${track.album?.images?.first.url}");
         if (image != null) {
           music.songImage = image;
           final tempSongColor = await getImagePalette(NetworkImage(image));
           if (tempSongColor != null) {
             music.songColor = tempSongColor;
+          
           }
         }
         music.artistImage = track.artists?.first.images?.first.url;

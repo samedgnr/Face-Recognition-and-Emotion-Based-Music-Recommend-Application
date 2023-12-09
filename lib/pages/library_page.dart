@@ -6,6 +6,7 @@ import 'package:music_recommendation_with_emotional_analysiss/pages/playlist_pag
 import 'package:music_recommendation_with_emotional_analysiss/search_delegate.dart';
 import 'package:music_recommendation_with_emotional_analysiss/services/database_service.dart';
 import 'package:music_recommendation_with_emotional_analysiss/snack_bar.dart';
+import '../models/colors.dart' as custom_colors;
 
 class MyPlaylistsPage extends StatefulWidget {
   const MyPlaylistsPage({super.key});
@@ -24,6 +25,7 @@ class _MyPlaylistPageState extends State<MyPlaylistsPage> {
   @override
   void initState() {
     super.initState();
+     
     gettingUserData();
   }
 
@@ -34,6 +36,7 @@ class _MyPlaylistPageState extends State<MyPlaylistsPage> {
         userId = "${FirebaseAuth.instance.currentUser!.uid}_$userName";
       });
       await gettingPlaylist();
+      await streamtoList();
     });
   }
 
@@ -43,7 +46,6 @@ class _MyPlaylistPageState extends State<MyPlaylistsPage> {
         setState(() {
           playlist = value;
         });
-        await streamtoList();
       });
     } catch (e) {
       print("Hata oluştu: $e");
@@ -51,16 +53,19 @@ class _MyPlaylistPageState extends State<MyPlaylistsPage> {
   }
 
   streamtoList() async {
-    try {
-      await for (QuerySnapshot snapshot in playlist!) {
-        for (QueryDocumentSnapshot doc in snapshot.docs) {
-          playlistList.add(doc.data() as Map<String, dynamic>);
-        }
+  try {
+    playlistList.clear(); // Listeyi temizle
+
+    await playlist!.forEach((snapshot) {
+      for (QueryDocumentSnapshot doc in snapshot.docs) {
+        playlistList.add(doc.data() as Map<String, dynamic>);
       }
-    } catch (e) {
-      print("Hata oluştu: $e");
-    }
+    });
+  } catch (e) {
+    print("Hata oluştu: $e");
   }
+}
+
 
   popUpDialog(BuildContext context) {
     showDialog(
@@ -131,14 +136,28 @@ class _MyPlaylistPageState extends State<MyPlaylistsPage> {
         });
   }
 
+  String getAfterUnderscore(String playlistOwner) {
+    int indexOfUnderscore = playlistOwner.indexOf('_');
+    if (indexOfUnderscore != -1 &&
+        indexOfUnderscore < playlistOwner.length - 1) {
+      return playlistOwner.substring(indexOfUnderscore + 1);
+    } else {
+      return playlistOwner;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Your Library"),
+        backgroundColor: custom_colors.pinkPrimary,
+        title: const Text(
+          "Your Library",
+          style: TextStyle(color: Colors.white),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.search),
+            icon: const Icon(Icons.search, color: Colors.white),
             onPressed: () {
               showSearch(
                 context: context,
@@ -147,12 +166,22 @@ class _MyPlaylistPageState extends State<MyPlaylistsPage> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add, color: Colors.white),
             onPressed: () {
               popUpDialog(context);
             },
           ),
         ],
+        elevation: 4,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(14),
+          ),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(7),
+          child: Container(),
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: playlist,
@@ -184,18 +213,78 @@ class _MyPlaylistPageState extends State<MyPlaylistsPage> {
                       ),
                     );
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Card(
-                      child: SizedBox(
-                        width: 80,
-                        height: 100,
-                        child: Center(
-                          child: Text(
-                            snapshot.data.docs[index]['playlistName'],
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: custom_colors.pinkPrimary,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.5),
+                          spreadRadius: 1,
+                          blurRadius: 5,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            image: const DecorationImage(
+                              image: NetworkImage(
+                                "https://community.spotify.com/t5/image/serverpage/image-id/25294i2836BD1C1A31BDF2/image-size/original?v=mpbl-1&px=-1",
+                                //snapshot.data.docs[index]['playlistIcon'],
+                              ),
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
-                      ),
+                        const SizedBox(width: 20),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment
+                                .start, // Align text to the left
+                            children: [
+                              Text(
+                                snapshot.data.docs[index]['playlistName'],
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Text(
+                                'Playlist: ${getAfterUnderscore(snapshot.data.docs[index]['playlistOwner'])}',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.play_arrow_rounded,
+                              color: Colors.black,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 );

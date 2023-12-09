@@ -139,7 +139,6 @@ class _HomePageState extends State<HomePage> {
           // Add Songs Button
           ElevatedButton(
             onPressed: () {
-              // Navigator ile "Add Songs" sayfasına yönlendirme
               Navigator.push(
                 context,
                 MaterialPageRoute(

@@ -52,7 +52,7 @@ class DatabaseService {
 
     // update the playlist
     await playlistDocumentReference.update({
-      "playlistId": uid,
+      "playlistId": playlistDocumentReference.id,
     });
 
     DocumentReference userDocumentReference = userCollection.doc(id);
@@ -131,15 +131,22 @@ class DatabaseService {
     playlistRef.collection('songs').doc(songId).delete();
   }
 
-  updateIsLiked(String playlistId, String songId, bool isLiked, String userId,
-      Map<String, dynamic> songData) async {
-    DocumentReference playlistRef =
-        FirebaseFirestore.instance.collection('playlists').doc(playlistId);
-    playlistRef
-        .collection('songs')
-        .doc(songId)
-        .update({"songisLiked": isLiked});
+  Future<void> updateIsLiked(String playlistId, String songId, bool isLiked,
+      String userId, Map<String, dynamic> songData) async {
+    CollectionReference songsCollectionn = FirebaseFirestore.instance
+        .collection('playlists')
+        .doc(playlistId)
+        .collection('songs');
 
+    QuerySnapshot songsQuery = await songsCollectionn
+        .where('SongTrackId', isEqualTo: songData["SongTrackId"])
+        .get();
+
+    for (QueryDocumentSnapshot songDoc in songsQuery.docs) {
+      await songDoc.reference.update({
+        "songisLiked": isLiked,
+      });
+    }
     if (isLiked) {
       CollectionReference playlistCollection =
           FirebaseFirestore.instance.collection('playlists');
@@ -149,9 +156,55 @@ class DatabaseService {
           .get();
       DocumentSnapshot playlistDoc = playlistQuery.docs.first;
 
-      await playlistDoc.reference.collection('songs').add(
-            songData,
-          );
+      CollectionReference songsCollection =
+          playlistDoc.reference.collection('songs');
+
+      DocumentReference addedSongDocRef = await songsCollection.add(songData);
+
+      String songId = addedSongDocRef.id;
+
+      await addedSongDocRef.update({
+        "songId": songId,
+      });
+    } else {
+      CollectionReference playlistCollection =
+          FirebaseFirestore.instance.collection('playlists');
+      QuerySnapshot playlistQuery = await playlistCollection
+          .where('playlistOwner', isEqualTo: userId)
+          .where('playlistName', isEqualTo: "Beğenilenler")
+          .get();
+
+      if (playlistQuery.size > 0) {
+        DocumentSnapshot playlistDoc = playlistQuery.docs.first;
+
+        QuerySnapshot songsQuery = await playlistDoc.reference
+            .collection('songs')
+            .where('SongTrackId', isEqualTo: songData["SongTrackId"])
+            .get();
+
+        if (songsQuery.size > 0) {
+          songsQuery.docs.first.reference.delete();
+        } else {
+          print('Belirtilen trackId değerine sahip şarkı bulunamadı.');
+        }
+      } else {
+        print('Beğenilenler playlisti bulunamadı.');
+      }
     }
+  }
+
+  //get likedSongs
+  getLikedSongs(String userId) async {
+    FirebaseFirestore.instance.collection('playlists');
+    QuerySnapshot playlistQuery = await playlistCollection
+        .where('playlistOwner', isEqualTo: userId)
+        .where('playlistName', isEqualTo: "Beğenilenler")
+        .get();
+
+    DocumentSnapshot playlistDoc = playlistQuery.docs.first;
+    QuerySnapshot songsQuery =
+        await playlistDoc.reference.collection('songs').get();
+
+        return songsQuery.docs.first.reference.get();
   }
 }
