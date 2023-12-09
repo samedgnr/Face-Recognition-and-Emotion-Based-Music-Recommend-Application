@@ -34,9 +34,10 @@ class _AddSongState extends State<AddSong> {
       "songIcon": "example_icon_url",
       "songDuration": "04:45",
       "SongTrackId": "3717eMglfGPYr9YKzdsiho",
+      "songisLiked": false,
       "SongAddTime": FieldValue.serverTimestamp(),
     };
-
-    DatabaseService().addSongs("MnFqEb3yWIT1T7n5sCLI", songData);
+    //DatabaseService().createPlaylist("samed", "B7lZKhzqfRZYdhRnu1IAlL3fols1" , "Beğenilenler");
+    DatabaseService().addSongs("L6tAdcfRGMNS3L5VbdPX", songData);
   }
 }

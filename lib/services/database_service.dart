@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class DatabaseService {
   final String? uid;
@@ -13,6 +14,7 @@ class DatabaseService {
   //saving user data
   Future savingUserData(
       String name, String number, String email, String password) async {
+    createPlaylist(name, uid!, "Beğenilenler");
     return await userCollection.doc(uid).set({
       "fullName": name,
       "number": number,
@@ -50,7 +52,7 @@ class DatabaseService {
 
     // update the playlist
     await playlistDocumentReference.update({
-      "playlistId": playlistDocumentReference.id,
+      "playlistId": uid,
     });
 
     DocumentReference userDocumentReference = userCollection.doc(id);
@@ -120,7 +122,6 @@ class DatabaseService {
 // delete playlist
   deletePlaylist(String playlistId) {
     playlistCollection.doc(playlistId).delete();
-    
   }
 
 // delete song playlist
@@ -128,5 +129,29 @@ class DatabaseService {
     DocumentReference playlistRef =
         FirebaseFirestore.instance.collection('playlists').doc(playlistId);
     playlistRef.collection('songs').doc(songId).delete();
+  }
+
+  updateIsLiked(String playlistId, String songId, bool isLiked, String userId,
+      Map<String, dynamic> songData) async {
+    DocumentReference playlistRef =
+        FirebaseFirestore.instance.collection('playlists').doc(playlistId);
+    playlistRef
+        .collection('songs')
+        .doc(songId)
+        .update({"songisLiked": isLiked});
+
+    if (isLiked) {
+      CollectionReference playlistCollection =
+          FirebaseFirestore.instance.collection('playlists');
+      QuerySnapshot playlistQuery = await playlistCollection
+          .where('playlistOwner', isEqualTo: userId)
+          .where('playlistName', isEqualTo: "Beğenilenler")
+          .get();
+      DocumentSnapshot playlistDoc = playlistQuery.docs.first;
+
+      await playlistDoc.reference.collection('songs').add(
+            songData,
+          );
+    }
   }
 }

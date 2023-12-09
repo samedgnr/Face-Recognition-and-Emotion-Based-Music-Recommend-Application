@@ -6,7 +6,7 @@ import 'package:music_recommendation_with_emotional_analysiss/constants/strings.
 import 'package:palette_generator/palette_generator.dart';
 import 'package:spotify/spotify.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
-import 'package:music_recommendation_with_emotional_analysiss/model/music_model.dart';
+import 'package:music_recommendation_with_emotional_analysiss/models/music_model.dart';
 
 class PlayMusicPage extends StatefulWidget {
   final String songTrackId;

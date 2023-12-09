@@ -16,7 +16,7 @@ class NavBar extends StatefulWidget {
 class _NavBarState extends State<NavBar> {
   final widgetOptions = [
     HomePage(),
-    const SearchPage(),
+     const SearchPage(),
     const MyPlaylistsPage(),
     const SettingsPage(),
   ];

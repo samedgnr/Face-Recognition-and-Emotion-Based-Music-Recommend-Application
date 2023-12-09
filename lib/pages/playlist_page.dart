@@ -18,6 +18,24 @@ class _PlaylistScreenState extends State<PlaylistPage> {
   String playlistName = "";
 
   @override
+  void initState() {
+    super.initState();
+    gettingPlaylistName();
+  }
+
+  gettingPlaylistName() async {
+    try {
+      DatabaseService().getPlaylistName(widget.playlistId).then((value) {
+        setState(() {
+          playlistName = value;
+        });
+      });
+    } catch (e) {
+      print("Hata oluştu: $e");
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
@@ -35,7 +53,7 @@ class _PlaylistScreenState extends State<PlaylistPage> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          title: const Text('Playlist'),
+          title: Text(playlistName),
           actions: [
             IconButton(
                 onPressed: () {
@@ -163,6 +181,19 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
           physics: const NeverScrollableScrollPhysics(),
           itemCount: snapshot.data.docs.length,
           itemBuilder: (context, index) {
+            bool isLiked =
+                snapshot.data.docs[index]['songisLiked'] ? true : false;
+            Map<String, dynamic> songData = {
+              "songName": snapshot.data.docs[index]['songName'],
+              "songSinger": snapshot.data.docs[index]['songSinger'],
+              "songIcon": snapshot.data.docs[index]['songIcon'],
+              "songDuration": snapshot.data.docs[index]['songDuration'],
+              "SongTrackId": snapshot.data.docs[index]['SongTrackId'],
+              "SongAddTime": snapshot.data.docs[index]['SongAddTime'],
+              "songId": snapshot.data.docs[index]['songId'],
+              "songisLiked": snapshot.data.docs[index]['songisLiked'],
+            };
+
             return GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -195,29 +226,38 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
                     '${snapshot.data.docs[index]['songSinger']} - ${snapshot.data.docs[index]['songDuration']}',
                     style: const TextStyle(color: Colors.white30),
                   ),
-                  trailing: GestureDetector(
-                    onTapDown: (TapDownDetails details) {
-                      Map<String, dynamic> songData = {
-                        "songName": snapshot.data.docs[index]['songName'],
-                        "songSinger": snapshot.data.docs[index]['songSinger'],
-                        "songIcon": snapshot.data.docs[index]['songIcon'],
-                        "songDuration": snapshot.data.docs[index]
-                            ['songDuration'],
-                        "SongTrackId": snapshot.data.docs[index]['SongTrackId'],
-                        "SongAddTime": snapshot.data.docs[index]['SongAddTime'],
-                        "songId": snapshot.data.docs[index]['songId'],
-                      };
-                      try {
-                        showPopMenu(context, details.globalPosition, playlist!,
-                            songData);
-                      } catch (e) {
-                        Exception(e);
-                      }
-                    },
-                    child: const Icon(
-                      Icons.more_horiz,
-                      color: Colors.white,
-                    ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          DatabaseService().updateIsLiked(widget.playlistId,
+                              snapshot.data.docs[index]['songId'], !isLiked ,userId,songData,);
+                          setState(() {
+                            snapshot.data.docs[index]['songisLiked'] = !isLiked;
+                          });
+                        },
+                        child: Icon(
+                          isLiked ? Icons.favorite : Icons.favorite_border,
+                          color: Colors.red,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTapDown: (TapDownDetails details) {
+                          try {
+                            showPopMenu(context, details.globalPosition,
+                                playlist!, songData);
+                          } catch (e) {
+                            Exception(e);
+                          }
+                        },
+                        child: const Icon(
+                          Icons.more_horiz,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
