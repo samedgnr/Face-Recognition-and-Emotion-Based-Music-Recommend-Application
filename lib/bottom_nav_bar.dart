@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:music_recommendation_with_emotional_analysiss/pages/homee_page.dart';
+import 'package:music_recommendation_with_emotional_analysiss/pages/home_page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/library_page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/search_page.dart';
 import '../models/colors.dart' as custom_colors;

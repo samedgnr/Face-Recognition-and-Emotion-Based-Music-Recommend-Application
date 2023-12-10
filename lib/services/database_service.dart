@@ -97,6 +97,7 @@ class DatabaseService {
   getPlaylists(String userId) async {
     return playlistCollection
         .where('playlistOwner', isEqualTo: userId)
+        //.orderBy('playlistCreateTime', descending: true)
         .snapshots();
   }
 
@@ -115,6 +116,7 @@ class DatabaseService {
 
     await documentReference.update({
       "songId": documentId,
+      "SongAddTime": FieldValue.serverTimestamp(),
     });
   }
 
@@ -129,6 +131,7 @@ class DatabaseService {
         FirebaseFirestore.instance.collection('playlists').doc(playlistId);
     playlistRef.collection('songs').doc(songId).delete();
   }
+
   //like a song 
   Future<void> updateIsLiked(String playlistId, String songId, bool isLiked,
       String userId, Map<String, dynamic> songData) async {
