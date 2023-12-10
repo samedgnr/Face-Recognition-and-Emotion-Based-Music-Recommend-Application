@@ -6,6 +6,7 @@ import 'package:music_recommendation_with_emotional_analysiss/pages/play_music_p
 import 'package:music_recommendation_with_emotional_analysiss/pages/playlist_page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/profile_page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/settings%20page/setting_body.dart';
+import 'package:music_recommendation_with_emotional_analysiss/snack_bar.dart';
 import '../models/colors.dart' as custom_colors;
 import 'package:music_recommendation_with_emotional_analysiss/services/database_service.dart';
 
@@ -20,6 +21,8 @@ class _HomePageState extends State<HomePage> {
   String userId = "";
   bool isShowingRecent = true;
   Stream<QuerySnapshot>? likedSongs;
+  String playlistName = "";
+  String likedPlaylistId = "";
 
   @override
   void initState() {
@@ -260,7 +263,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 const SizedBox(
-                  height: 20,
+                  height: 22,
                 ),
                 Row(
                   children: [
@@ -356,9 +359,9 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     Expanded(
-                        flex: 6,
+                        flex: 10,
                         child: Padding(
-                          padding: const EdgeInsets.only(right: 20.0, left: 8),
+                          padding: const EdgeInsets.only(right: 36, left: 6),
                           child: StreamBuilder<QuerySnapshot>(
                             stream: likedSongs,
                             builder: (context, AsyncSnapshot snapshot) {
@@ -375,53 +378,116 @@ class _HomePageState extends State<HomePage> {
                                   child: Text('Veri bulunamadı.'),
                                 );
                               }
-                              return ListView.builder(
-                                itemCount: isShowingRecent
-                                    ? snapshot.data.docs.length
-                                    : snapshot.data.docs.length,
-                                itemBuilder: (context, index) {
-                                  if (isShowingRecent) {
-                                    return const Column(
-                                      children: [Text("recent Songs")],
-                                    );
-                                  } else {
-                                    return ListTile(
-                                      contentPadding: EdgeInsets.zero,
-                                      leading: ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: Container(
-                                            height: 52,
-                                            width: 52,
-                                            child: Image.network(
-                                              snapshot.data.docs[index]['songIcon'],
-                                              fit: BoxFit.cover,
-                                            )),
-                                      ),
-                                      title: Text(
-                                        snapshot.data.docs[index]['songName'],
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                      subtitle: Text(
-                                        snapshot.data.docs[index]['songSinger'],
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.black54,
-                                        ),
-                                      ),
-                                      trailing: Text(
-                                        snapshot.data.docs[index]['songDuration'],
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.black54,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                },
+                              return SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: snapshot.data.docs.length,
+                                      itemBuilder: (context, index) {
+                                        Map<String, dynamic> songData = {
+                                          "songName": snapshot.data.docs[index]
+                                              ['songName'],
+                                          "songSinger": snapshot
+                                              .data.docs[index]['songSinger'],
+                                          "songIcon": snapshot.data.docs[index]
+                                              ['songIcon'],
+                                          "songDuration": snapshot
+                                              .data.docs[index]['songDuration'],
+                                          "SongTrackId": snapshot
+                                              .data.docs[index]['SongTrackId'],
+                                          "SongAddTime": snapshot
+                                              .data.docs[index]['SongAddTime'],
+                                          "songId": snapshot.data.docs[index]
+                                              ['songId'],
+                                          "songisLiked": snapshot
+                                              .data.docs[index]['songisLiked'],
+                                        };
+                                        return Container(
+                                          margin: const EdgeInsets.symmetric(
+                                              vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      PlayMusicPage(
+                                                    songName: snapshot
+                                                            .data.docs[index]
+                                                        ['songName'],
+                                                    songTrackId: snapshot
+                                                            .data.docs[index]
+                                                        ['SongTrackId'],
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      16, 0, 8, 0),
+                                              child: ListTile(
+                                                contentPadding: EdgeInsets.zero,
+                                                leading: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                  child: Image.network(
+                                                    snapshot.data.docs[index]
+                                                        ['songIcon'],
+                                                    width: 45,
+                                                  ),
+                                                ),
+                                                title: Text(
+                                                  snapshot.data.docs[index]
+                                                      ['songName'],
+                                                  style: const TextStyle(
+                                                      color: Colors.black),
+                                                ),
+                                                subtitle: Text(
+                                                  '${snapshot.data.docs[index]['songSinger']} - ${snapshot.data.docs[index]['songDuration']}',
+                                                  style: const TextStyle(
+                                                      color: Colors.grey),
+                                                ),
+                                                tileColor: Colors.white,
+                                                trailing: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    GestureDetector(
+                                                      onTapDown: (TapDownDetails
+                                                          details) {
+                                                        try {
+                                                          showPopMenu(
+                                                              context,
+                                                              details
+                                                                  .globalPosition,
+                                                              playlist!,
+                                                              songData);
+                                                        } catch (e) {
+                                                          Exception(e);
+                                                        }
+                                                      },
+                                                      child: const Icon(
+                                                        Icons.more_horiz,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
                               );
                             },
                           ),
@@ -507,5 +573,181 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ));
+  }
+
+  void showPopMenu(BuildContext context, Offset offset,
+      Stream<QuerySnapshot> playlists, Map<String, dynamic> songData) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.add),
+                title: const Text('Playlist\'e Ekle'),
+                onTap: () {
+                  Navigator.pop(context);
+                  showPopupMenu(context, offset, playlist!, songData);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.remove),
+                title: const Text('Playlist\'ten Kaldır'),
+                onTap: () {
+                  try {
+                    DatabaseService()
+                        .deleteSongPlaylist("", songData["songId"]);
+                    mySnackBar(context,
+                        " ${songData["songName"]} şarkısı playlistten kaldırıldı.");
+                    Navigator.pop(context);
+                  } catch (e) {
+                    Exception(e);
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void showPopupMenu(BuildContext context, Offset offset,
+      Stream<QuerySnapshot> playlists, Map<String, dynamic> songData) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return StreamBuilder<QuerySnapshot>(
+          stream: playlists,
+          builder: (context, AsyncSnapshot snapshot) {
+            if (snapshot.hasError) {
+              return Center(
+                child: Text('Veri alınamadı: ${snapshot.error}'),
+              );
+            }
+
+            if (!snapshot.hasData || snapshot.data.docs.isEmpty) {
+              return const Center(
+                child: Text('Veri bulunamadı.'),
+              );
+            }
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      popUpDialog(context);
+                    },
+                    child: const Text('Playlist Oluştur'),
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: snapshot.data.docs.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Row(
+                          children: [
+                            Text(
+                              snapshot.data.docs[index]['playlistName'],
+                              style: const TextStyle(color: Colors.black),
+                            ),
+                          ],
+                        ),
+                        onTap: () {
+                          try {
+                            DatabaseService().addSongs(
+                                snapshot.data.docs[index]['playlistId'],
+                                songData);
+                            mySnackBar(context,
+                                "${snapshot.data.docs[index]['playlistName']} playlistine ${songData["songName"]} şarkısı eklendi");
+                            Navigator.pop(context);
+                          } catch (e) {
+                            Exception(e);
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  popUpDialog(BuildContext context) {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(builder: ((context, setState) {
+            return AlertDialog(
+              title: const Text(
+                "Create a playlist",
+                textAlign: TextAlign.left,
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    onChanged: (val) {
+                      setState(() {
+                        playlistName = val;
+                      });
+                    },
+                    style: const TextStyle(color: Colors.black),
+                    decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Colors.deepPurple),
+                            borderRadius: BorderRadius.circular(20)),
+                        errorBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Colors.deepPurple),
+                            borderRadius: BorderRadius.circular(20)),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Theme.of(context).primaryColor),
+                            borderRadius: BorderRadius.circular(20))),
+                  ),
+                ],
+              ),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple),
+                  child: const Text("CANCEL"),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (playlistName != "") {
+                      DatabaseService(
+                              uid: FirebaseAuth.instance.currentUser!.uid)
+                          .createPlaylist(
+                              userName,
+                              FirebaseAuth.instance.currentUser!.uid,
+                              playlistName);
+                      Navigator.of(context).pop();
+                      mySnackBar(context, "Playlist created successfully.");
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple),
+                  child: const Text("CREATE"),
+                )
+              ],
+            );
+          }));
+        });
   }
 }

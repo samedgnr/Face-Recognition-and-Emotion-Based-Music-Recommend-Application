@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/homee_page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/library_page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/search_page.dart';
-import 'package:music_recommendation_with_emotional_analysiss/pages/settings%20page/setting_body.dart';
 import '../models/colors.dart' as custom_colors;
 
 class NavBar extends StatefulWidget {

@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class DatabaseService {
   final String? uid;
@@ -130,7 +129,7 @@ class DatabaseService {
         FirebaseFirestore.instance.collection('playlists').doc(playlistId);
     playlistRef.collection('songs').doc(songId).delete();
   }
-
+  //like a song 
   Future<void> updateIsLiked(String playlistId, String songId, bool isLiked,
       String userId, Map<String, dynamic> songData) async {
     CollectionReference songsCollectionn = FirebaseFirestore.instance
@@ -194,17 +193,17 @@ class DatabaseService {
   }
 
   //get likedSongs
-  getLikedSongs(String userId) async {
-    FirebaseFirestore.instance.collection('playlists');
+  Future<dynamic> getLikedSongs(String userId) async {
+    CollectionReference playlistCollection =
+        FirebaseFirestore.instance.collection('playlists');
+
     QuerySnapshot playlistQuery = await playlistCollection
         .where('playlistOwner', isEqualTo: userId)
         .where('playlistName', isEqualTo: "Beğenilenler")
         .get();
 
     DocumentSnapshot playlistDoc = playlistQuery.docs.first;
-    QuerySnapshot songsQuery =
-        await playlistDoc.reference.collection('songs').get();
 
-        return songsQuery.docs.first.reference.get();
+    return playlistDoc.reference.collection('songs').snapshots();
   }
 }
