@@ -5,6 +5,7 @@ import 'package:music_recommendation_with_emotional_analysiss/helper/helper_func
 import 'package:music_recommendation_with_emotional_analysiss/pages/play_music_page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/services/database_service.dart';
 import 'package:music_recommendation_with_emotional_analysiss/snack_bar.dart';
+import '../models/colors.dart' as custom_colors;
 
 class PlaylistPage extends StatefulWidget {
   final String playlistId;
@@ -43,8 +44,8 @@ class _PlaylistScreenState extends State<PlaylistPage> {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.deepPurple.shade800.withOpacity(0.8),
-            Colors.deepPurple.shade200.withOpacity(0.8),
+            custom_colors.pinkPrimary.withOpacity(0.8),
+            const Color.fromARGB(255, 163, 137, 211).withOpacity(0.8),
           ],
         ),
       ),
@@ -53,7 +54,7 @@ class _PlaylistScreenState extends State<PlaylistPage> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          title: Text(playlistName),
+          title: Text(playlistName,style: const TextStyle(color: Colors.white),),
           actions: [
             IconButton(
                 onPressed: () {
@@ -62,7 +63,7 @@ class _PlaylistScreenState extends State<PlaylistPage> {
                       context: context,
                       builder: (context) {
                         return AlertDialog(
-                          title: const Text("Exit"),
+                          title: const Text("Delete"),
                           content: const Text(
                               "Are you sure you delete the playlist? "),
                           actions: [
@@ -70,9 +71,9 @@ class _PlaylistScreenState extends State<PlaylistPage> {
                               onPressed: () {
                                 Navigator.pop(context);
                               },
-                              icon: const Icon(
+                              icon:  Icon(
                                 Icons.cancel,
-                                color: Colors.deepPurple,
+                                color: custom_colors.pinkPrimary,
                               ),
                             ),
                             IconButton(
@@ -82,9 +83,9 @@ class _PlaylistScreenState extends State<PlaylistPage> {
                                 Navigator.pop(context);
                                 Navigator.pop(context);
                               },
-                              icon: const Icon(
+                              icon:  Icon(
                                 Icons.done,
-                                color: Colors.deepPurple,
+                                color: custom_colors.pinkPrimary,
                               ),
                             ),
                           ],
@@ -93,6 +94,7 @@ class _PlaylistScreenState extends State<PlaylistPage> {
                 },
                 icon: const Icon(Icons.exit_to_app))
           ],
+           iconTheme: const IconThemeData(color: Colors.white),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -229,7 +231,6 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          print(songData["songId"]);
                           DatabaseService().updateIsLiked(
                             widget.playlistId,
                             snapshot.data.docs[index]['songId'],
@@ -296,11 +297,11 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
                     decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
                             borderSide:
-                                const BorderSide(color: Colors.deepPurple),
+                                 BorderSide(color: custom_colors.buttonColor),
                             borderRadius: BorderRadius.circular(20)),
                         errorBorder: OutlineInputBorder(
                             borderSide:
-                                const BorderSide(color: Colors.deepPurple),
+                                 BorderSide(color: custom_colors.buttonColor),
                             borderRadius: BorderRadius.circular(20)),
                         focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -315,7 +316,7 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
                     Navigator.of(context).pop();
                   },
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple),
+                      backgroundColor: custom_colors.buttonColor),
                   child: const Text("CANCEL"),
                 ),
                 ElevatedButton(
@@ -332,7 +333,7 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple),
+                      backgroundColor: custom_colors.buttonColor),
                   child: const Text("CREATE"),
                 )
               ],
@@ -370,7 +371,7 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
                     onPressed: () {
                       popUpDialog(context);
                     },
-                    child: const Text('Playlist Oluştur'),
+                    child:  Text('Playlist Oluştur',style: TextStyle(color: custom_colors.buttonColor),),
                   ),
                 ),
                 Expanded(
@@ -474,6 +475,7 @@ class _PlaylistInformation extends StatelessWidget {
         Text(
           playlistName,
           style: const TextStyle(
+            color: Colors.white,
             fontSize: 25,
           ),
         ),

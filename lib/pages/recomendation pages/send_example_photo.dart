@@ -3,24 +3,14 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 
-void main() => runApp(MyApp());
+class SendExamplePhoto extends StatefulWidget {
+  const SendExamplePhoto({super.key});
 
-class MyApp extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Photo Analyzer',
-      home: PhotoAnalyzerScreen(),
-    );
-  }
+  State<SendExamplePhoto> createState() => _SendExamplePhotoState();
 }
 
-class PhotoAnalyzerScreen extends StatefulWidget {
-  @override
-  State<PhotoAnalyzerScreen> createState() => _PhotoAnalyzerScreenState();
-}
-
-class _PhotoAnalyzerScreenState extends State<PhotoAnalyzerScreen> {
+class _SendExamplePhotoState extends State<SendExamplePhoto> {
   String playlistUrl = '';
   Future<void> analyzeImage(BuildContext context) async {
     final url = Uri.parse(
@@ -84,7 +74,7 @@ class _PhotoAnalyzerScreenState extends State<PhotoAnalyzerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Photo Analyzer'),
+        title: Text("Fotograf Gönder"),
       ),
       body: Center(
         child: ElevatedButton(

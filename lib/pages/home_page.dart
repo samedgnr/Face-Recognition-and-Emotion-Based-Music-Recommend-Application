@@ -5,6 +5,9 @@ import 'package:music_recommendation_with_emotional_analysiss/helper/helper_func
 import 'package:music_recommendation_with_emotional_analysiss/pages/play_music_page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/playlist_page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/profile_page.dart';
+import 'package:music_recommendation_with_emotional_analysiss/pages/recomendation%20pages/get_recommendation.dart';
+import 'package:music_recommendation_with_emotional_analysiss/pages/recomendation%20pages/send_example_photo.dart';
+import 'package:music_recommendation_with_emotional_analysiss/pages/recomendation%20pages/send_photo.page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/settings%20page/setting_body.dart';
 import 'package:music_recommendation_with_emotional_analysiss/snack_bar.dart';
 import '../models/colors.dart' as custom_colors;
@@ -65,14 +68,218 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  popUpDialog(BuildContext context) {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(builder: ((context, setState) {
+            return AlertDialog(
+              title: const Text(
+                "Create a playlist",
+                textAlign: TextAlign.left,
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    onChanged: (val) {
+                      setState(() {
+                        playlistName = val;
+                      });
+                    },
+                    style: const TextStyle(color: Colors.black),
+                    decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: custom_colors.buttonColor),
+                            borderRadius: BorderRadius.circular(20)),
+                        errorBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: custom_colors.buttonColor),
+                            borderRadius: BorderRadius.circular(20)),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Theme.of(context).primaryColor),
+                            borderRadius: BorderRadius.circular(20))),
+                  ),
+                ],
+              ),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: custom_colors.buttonColor),
+                  child: const Text("CANCEL"),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (playlistName != "") {
+                      DatabaseService(
+                              uid: FirebaseAuth.instance.currentUser!.uid)
+                          .createPlaylist(
+                              userName,
+                              FirebaseAuth.instance.currentUser!.uid,
+                              playlistName);
+                      Navigator.of(context).pop();
+                      mySnackBar(context, "Playlist created successfully.");
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: custom_colors.buttonColor),
+                  child: const Text("CREATE"),
+                )
+              ],
+            );
+          }));
+        });
+  }
+
+  void showPopupMenu(
+      BuildContext context, Offset offset, Map<String, dynamic> songData) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return StreamBuilder<QuerySnapshot>(
+          stream: playlist,
+          builder: (context, AsyncSnapshot snapshot) {
+            print(snapshot.data);
+            if (snapshot.hasError) {
+              return Center(
+                child: Text('Veri alınamadı: ${snapshot.error}'),
+              );
+            }
+
+            if (!snapshot.hasData || snapshot.data.docs.isEmpty) {
+              return const Center(
+                child: Text('Veri bulunamadı.'),
+              );
+            }
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      popUpDialog(context);
+                    },
+                    child: Text(
+                      'Playlist Oluştur',
+                      style: TextStyle(color: custom_colors.buttonColor),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: snapshot.data.docs.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Row(
+                          children: [
+                            Text(
+                              snapshot.data.docs[index]['playlistName'],
+                              style: const TextStyle(color: Colors.black),
+                            ),
+                          ],
+                        ),
+                        onTap: () {
+                          try {
+                            DatabaseService().addSongs(
+                                snapshot.data.docs[index]['playlistId'],
+                                songData);
+                            mySnackBar(context,
+                                "${snapshot.data.docs[index]['playlistName']} playlistine ${songData["songName"]} şarkısı eklendi");
+                            Navigator.pop(context);
+                          } catch (e) {
+                            Exception(e);
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void showPopMenu(
+      BuildContext context, Offset offset, Map<String, dynamic> songData) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.add),
+                title: const Text('Playlist\'e Ekle'),
+                onTap: () {
+                  Navigator.pop(context);
+                  showPopupMenu(context, offset, songData);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.remove),
+                title: const Text('Playlist\'ten Kaldır'),
+                onTap: () {
+                  try {
+                    // DatabaseService().deleteSongPlaylist(
+                    //     widget.playlistId, songData["songId"]);
+                    // mySnackBar(context,
+                    //     " ${songData["songName"]} şarkısı playlistten kaldırıldı.");
+                    // Navigator.pop(context);
+                  } catch (e) {
+                    Exception(e);
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            backgroundColor: custom_colors.pinkPrimary,
-            title: const Text('SpoCV', style: TextStyle(color: Colors.white)),
-            centerTitle: true,
-            iconTheme: const IconThemeData(color: Colors.white)),
+          backgroundColor: custom_colors.pinkPrimary,
+          title: const Text('SpoCV', style: TextStyle(color: Colors.white)),
+          centerTitle: true,
+          iconTheme: const IconThemeData(color: Colors.white),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.photo),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SendExamplePhoto()),
+                );
+              },
+              color: Colors.white,
+            ),
+            IconButton(
+              icon: const Icon(Icons.camera_alt),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const GetRecommendations()),
+                );
+              },
+              color: Colors.white,
+            ),
+            
+          ],
+        ),
         body: Stack(
           children: [
             Column(
@@ -204,7 +411,7 @@ class _HomePageState extends State<HomePage> {
                                                         .withOpacity(0.5),
                                                     spreadRadius: 1,
                                                     blurRadius: 5,
-                                                    offset: Offset(0, 5),
+                                                    offset: const Offset(0, 5),
                                                   ),
                                                 ],
                                               ),
@@ -467,7 +674,6 @@ class _HomePageState extends State<HomePage> {
                                                               context,
                                                               details
                                                                   .globalPosition,
-                                                              playlist!,
                                                               songData);
                                                         } catch (e) {
                                                           Exception(e);
@@ -573,181 +779,5 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ));
-  }
-
-  void showPopMenu(BuildContext context, Offset offset,
-      Stream<QuerySnapshot> playlists, Map<String, dynamic> songData) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          child: Wrap(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.add),
-                title: const Text('Playlist\'e Ekle'),
-                onTap: () {
-                  Navigator.pop(context);
-                  showPopupMenu(context, offset, playlist!, songData);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.remove),
-                title: const Text('Playlist\'ten Kaldır'),
-                onTap: () {
-                  try {
-                    DatabaseService()
-                        .deleteSongPlaylist("", songData["songId"]);
-                    mySnackBar(context,
-                        " ${songData["songName"]} şarkısı playlistten kaldırıldı.");
-                    Navigator.pop(context);
-                  } catch (e) {
-                    Exception(e);
-                  }
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void showPopupMenu(BuildContext context, Offset offset,
-      Stream<QuerySnapshot> playlists, Map<String, dynamic> songData) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return StreamBuilder<QuerySnapshot>(
-          stream: playlists,
-          builder: (context, AsyncSnapshot snapshot) {
-            if (snapshot.hasError) {
-              return Center(
-                child: Text('Veri alınamadı: ${snapshot.error}'),
-              );
-            }
-
-            if (!snapshot.hasData || snapshot.data.docs.isEmpty) {
-              return const Center(
-                child: Text('Veri bulunamadı.'),
-              );
-            }
-
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      popUpDialog(context);
-                    },
-                    child: const Text('Playlist Oluştur'),
-                  ),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: snapshot.data.docs.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Row(
-                          children: [
-                            Text(
-                              snapshot.data.docs[index]['playlistName'],
-                              style: const TextStyle(color: Colors.black),
-                            ),
-                          ],
-                        ),
-                        onTap: () {
-                          try {
-                            DatabaseService().addSongs(
-                                snapshot.data.docs[index]['playlistId'],
-                                songData);
-                            mySnackBar(context,
-                                "${snapshot.data.docs[index]['playlistName']} playlistine ${songData["songName"]} şarkısı eklendi");
-                            Navigator.pop(context);
-                          } catch (e) {
-                            Exception(e);
-                          }
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-
-  popUpDialog(BuildContext context) {
-    showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) {
-          return StatefulBuilder(builder: ((context, setState) {
-            return AlertDialog(
-              title: const Text(
-                "Create a playlist",
-                textAlign: TextAlign.left,
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    onChanged: (val) {
-                      setState(() {
-                        playlistName = val;
-                      });
-                    },
-                    style: const TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                            borderSide:
-                                const BorderSide(color: Colors.deepPurple),
-                            borderRadius: BorderRadius.circular(20)),
-                        errorBorder: OutlineInputBorder(
-                            borderSide:
-                                const BorderSide(color: Colors.deepPurple),
-                            borderRadius: BorderRadius.circular(20)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).primaryColor),
-                            borderRadius: BorderRadius.circular(20))),
-                  ),
-                ],
-              ),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple),
-                  child: const Text("CANCEL"),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (playlistName != "") {
-                      DatabaseService(
-                              uid: FirebaseAuth.instance.currentUser!.uid)
-                          .createPlaylist(
-                              userName,
-                              FirebaseAuth.instance.currentUser!.uid,
-                              playlistName);
-                      Navigator.of(context).pop();
-                      mySnackBar(context, "Playlist created successfully.");
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple),
-                  child: const Text("CREATE"),
-                )
-              ],
-            );
-          }));
-        });
   }
 }

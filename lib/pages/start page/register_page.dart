@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../helper/helper_function.dart';
-import '../services/auth_service.dart';
-import '../snack_bar.dart';
+import '../../helper/helper_function.dart';
+import '../../services/auth_service.dart';
+import '../../snack_bar.dart';
 
 class RegisterPage extends StatefulWidget {
   final VoidCallback showLoginPage;

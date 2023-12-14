@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
-import '../../start page/main_page.dart';
+import '../start page/main_page.dart';
 
 class SettingsList extends StatelessWidget {
   const SettingsList({super.key});

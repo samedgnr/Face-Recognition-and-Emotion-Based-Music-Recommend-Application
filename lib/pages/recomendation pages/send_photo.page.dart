@@ -3,19 +3,19 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 
-class FotoGonder extends StatefulWidget {
-  const FotoGonder({super.key});
+
+class SendPhoto extends StatefulWidget {
+  const SendPhoto({super.key});
 
   @override
-  State<FotoGonder> createState() => _FotoGonderState();
+  State<SendPhoto> createState() => _SendPhotoState();
 }
 
-class _FotoGonderState extends State<FotoGonder> {
-  String playlistUrl = '';
+class _SendPhotoState extends State<SendPhoto> {
+   String playlistUrl = '';
   Future<void> analyzeImage(BuildContext context) async {
     final url = Uri.parse(
         'https://berwyndentalconnection.com/wp-content/uploads/2018/04/Change-Your-Life-With-a-Smile.jpg');
-
     try {
       final response = await http.get(url);
 
@@ -69,20 +69,18 @@ class _FotoGonderState extends State<FotoGonder> {
           const SnackBar(content: Text('Failed to analyze the image.')));
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Fotograf Gönder"),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () => analyzeImage(context),
-          child: Text('Analyze Image from File'),
-          // Buton metnini güncelledik
+        appBar: AppBar(
+          title: const Text('Photo Analyzer'),
         ),
-      ),
-    );
+        body: Center(
+          child: ElevatedButton(
+            onPressed: () => analyzeImage(context),
+            child: const Text('Analyze Image from File'),
+            // Buton metnini güncelledik
+          ),
+        ));
   }
 }

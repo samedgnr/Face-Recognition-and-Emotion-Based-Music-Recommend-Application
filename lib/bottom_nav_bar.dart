@@ -37,23 +37,23 @@ class _NavBarState extends State<NavBar> {
         showSelectedLabels: true,
         unselectedItemColor: Colors.white,
         selectedItemColor: custom_colors.pinkPrimary,
-        items: const [
+        items: [
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.home,
-                color: Color.fromARGB(255, 109, 12, 109),
+                color: custom_colors.buttonColor,
               ),
               label: "Home"),
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.search,
-                color: Color.fromARGB(255, 109, 12, 109),
+                color: custom_colors.buttonColor,
               ),
               label: "Search"),
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.library_books,
-                color: Color.fromARGB(255, 109, 12, 109),
+                color: custom_colors.buttonColor,
               ),
               label: "Your Library"),
           

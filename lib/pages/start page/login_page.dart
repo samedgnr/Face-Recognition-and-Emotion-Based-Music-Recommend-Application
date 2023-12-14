@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:music_recommendation_with_emotional_analysiss/snack_bar.dart';
-import '../helper/helper_function.dart';
-import '../services/auth_service.dart';
-import '../services/database_service.dart';
+import '../../helper/helper_function.dart';
+import '../../services/auth_service.dart';
+import '../../services/database_service.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 

@@ -54,7 +54,7 @@ class _MyPlaylistPageState extends State<MyPlaylistsPage> {
 
   streamtoList() async {
   try {
-    playlistList.clear(); // Listeyi temizle
+    playlistList.clear();
 
     await playlist!.forEach((snapshot) {
       for (QueryDocumentSnapshot doc in snapshot.docs) {

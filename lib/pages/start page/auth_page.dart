@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:music_recommendation_with_emotional_analysiss/start%20page/register_page.dart';
+import 'package:music_recommendation_with_emotional_analysiss/pages/start%20page/register_page.dart';
 import 'login_page.dart';
 
 class AuthPage extends StatefulWidget {
