@@ -60,6 +60,27 @@ class DatabaseService {
           ["${playlistDocumentReference.id}_$playlistName"])
     });
   }
+  Future<String> createPlaylistGetId(String userName, String id, String playlistName) async {
+  DocumentReference playlistDocumentReference = await playlistCollection.add({
+    "playlistName": playlistName,
+    "playlistIcon": "",
+    "playlistOwner": "${id}_$userName",
+    "playlistId": "",  
+    "playlistSongs": "",
+    "playlistCreateTime": FieldValue.serverTimestamp(),
+  });
+
+  await playlistDocumentReference.update({
+    "playlistId": playlistDocumentReference.id,
+  });
+
+  DocumentReference userDocumentReference = userCollection.doc(id);
+  await userDocumentReference.update({
+    "playlist": FieldValue.arrayUnion(["${playlistDocumentReference.id}_$playlistName"]),
+  });
+
+  return playlistDocumentReference.id;
+}
 
   // getting the songs
   getSongs(String playlistId) async {

@@ -4,9 +4,9 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 
-
 class EmotionDetectionService {
-  static const String baseUrl = "http://10.0.2.2:5000"; // Update with your Flask server IP
+  static const String baseUrl =
+      "http://10.0.2.2:5000"; // Update with your Flask server IP
 
   static Future<Map<String, dynamic>> processImage(Uint8List imageBytes) async {
     String base64Image = base64Encode(imageBytes);
@@ -23,18 +23,18 @@ class EmotionDetectionService {
     }
   }
 
-  
-  static Future<Map<String, dynamic>> getRecommendations(String emotion , List<String> genres , List<String> artistIds ) async {
-    List<String> artistIds = ['duman', 'ezhel'];
-    List<String> genres = ['alternative', 'rock'];
-
+  static Future<Map<String, dynamic>> getRecommendations(
+      String emotion, List<String> genre, List<String> artist) async {
+    List<String> artists = artist;
+    List<String> genres = genre;
+    print(genres);
+    print(artists);
     final response = await http.post(
       Uri.parse('$baseUrl/get_recommendations'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        
         'emotion': emotion,
-        'artist_ids': artistIds,
+        'artist_names': artists,
         'genres': genres,
       }),
     );

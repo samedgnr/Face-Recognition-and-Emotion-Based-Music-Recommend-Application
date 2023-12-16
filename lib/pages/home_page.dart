@@ -5,9 +5,7 @@ import 'package:music_recommendation_with_emotional_analysiss/helper/helper_func
 import 'package:music_recommendation_with_emotional_analysiss/pages/play_music_page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/playlist_page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/profile_page.dart';
-import 'package:music_recommendation_with_emotional_analysiss/pages/recomendation%20pages/get_recommendation.dart';
-import 'package:music_recommendation_with_emotional_analysiss/pages/recomendation%20pages/send_example_photo.dart';
-import 'package:music_recommendation_with_emotional_analysiss/pages/recomendation%20pages/send_photo.page.dart';
+import 'package:music_recommendation_with_emotional_analysiss/pages/recomendation%20pages/select_languagee.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/settings%20page/setting_body.dart';
 import 'package:music_recommendation_with_emotional_analysiss/snack_bar.dart';
 import '../models/colors.dart' as custom_colors;
@@ -164,6 +162,7 @@ class _HomePageState extends State<HomePage> {
                 Padding(
                   padding: const EdgeInsets.all(5.0),
                   child: ElevatedButton(
+                  
                     onPressed: () {
                       popUpDialog(context);
                     },
@@ -258,26 +257,19 @@ class _HomePageState extends State<HomePage> {
           iconTheme: const IconThemeData(color: Colors.white),
           actions: [
             IconButton(
-              icon: const Icon(Icons.photo),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SendExamplePhoto()),
-                );
-              },
-              color: Colors.white,
-            ),
-            IconButton(
+              
+              
               icon: const Icon(Icons.camera_alt),
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const GetRecommendations()),
+                  MaterialPageRoute(
+                    builder: (context) => const SelectLanguagee(),
+                  ),
                 );
               },
               color: Colors.white,
             ),
-            
           ],
         ),
         body: Stack(
