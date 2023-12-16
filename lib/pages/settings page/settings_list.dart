@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
 import '../start page/main_page.dart';
+import '../../models/colors.dart' as custom_colors;
 
 class SettingsList extends StatelessWidget {
   const SettingsList({super.key});
@@ -48,14 +49,15 @@ logoutDialog(BuildContext context) {
   Widget cancelButton = TextButton(
     child: const Text(
       "Cancel",
-      style: TextStyle(color: Colors.deepPurple),
+      style: TextStyle(color: Color.fromARGB(255, 109, 12, 109)),
     ),
     onPressed: () {
       Navigator.of(context).pop();
     },
   );
   Widget continueButton = TextButton(
-    child: const Text("Continue", style: TextStyle(color: Colors.deepPurple)),
+    child: const Text("Continue",
+        style: TextStyle(color: Color.fromARGB(255, 109, 12, 109))),
     onPressed: () {
       authService.signOut();
       Navigator.of(context).pushAndRemoveUntil(
@@ -64,7 +66,6 @@ logoutDialog(BuildContext context) {
     },
   );
 
-  // set up the AlertDialog
   AlertDialog alert = AlertDialog(
     title: const Text("Logging out"),
     content: const Text("Are you sure?"),
@@ -74,7 +75,7 @@ logoutDialog(BuildContext context) {
     ],
   );
 
-  // show the dialog
+
   showDialog(
     context: context,
     builder: (BuildContext context) {

@@ -115,7 +115,7 @@ class PlaylistSearchDelegate extends SearchDelegate {
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment
-                              .start, // Align text to the left
+                              .start, 
                           children: [
                             Text(
                               filteredPlaylists[index]['playlistName'],

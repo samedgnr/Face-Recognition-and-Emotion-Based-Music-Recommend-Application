@@ -46,7 +46,6 @@ class _SettingsListViewState extends State<SettingsListView> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        //Profil bolumu
         GestureDetector(
           child: Padding(
             padding: const EdgeInsets.only(top: 15.0),
@@ -61,7 +60,7 @@ class _SettingsListViewState extends State<SettingsListView> {
                         padding: EdgeInsets.all(10.0),
                         child: CircleAvatar(
                           radius: 50,
-                          backgroundImage: AssetImage("lib/images/aa.png"),
+                          backgroundImage: AssetImage("lib/images/noPhoto.jpg"),
                         ),
                       ),
                       const SizedBox(
@@ -79,7 +78,6 @@ class _SettingsListViewState extends State<SettingsListView> {
           ),
           onTap: () {},
         ),
-        //secenekler bolumu
         const Padding(
           padding: EdgeInsets.only(top: 15.0),
           child: SizedBox(

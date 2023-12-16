@@ -25,7 +25,7 @@ class _MyPlaylistPageState extends State<MyPlaylistsPage> {
   @override
   void initState() {
     super.initState();
-     
+
     gettingUserData();
   }
 
@@ -36,7 +36,7 @@ class _MyPlaylistPageState extends State<MyPlaylistsPage> {
         userId = "${FirebaseAuth.instance.currentUser!.uid}_$userName";
       });
       await gettingPlaylist();
-      await streamtoList();
+      //await streamtoList();
     });
   }
 
@@ -52,20 +52,19 @@ class _MyPlaylistPageState extends State<MyPlaylistsPage> {
     }
   }
 
-  streamtoList() async {
-  try {
-    playlistList.clear();
+//   streamtoList() async {
+//   try {
+//     playlistList.clear();
 
-    await playlist!.forEach((snapshot) {
-      for (QueryDocumentSnapshot doc in snapshot.docs) {
-        playlistList.add(doc.data() as Map<String, dynamic>);
-      }
-    });
-  } catch (e) {
-    print("Hata oluştu: $e");
-  }
-}
-
+//     await playlist!.forEach((snapshot) {
+//       for (QueryDocumentSnapshot doc in snapshot.docs) {
+//         playlistList.add(doc.data() as Map<String, dynamic>);
+//       }
+//     });
+//   } catch (e) {
+//     print("Hata oluştu: $e");
+//   }
+// }
 
   popUpDialog(BuildContext context) {
     showDialog(
@@ -197,6 +196,12 @@ class _MyPlaylistPageState extends State<MyPlaylistsPage> {
               child: Text('Veri bulunamadı.'),
             );
           }
+
+          playlistList.clear(); 
+
+          snapshot.data!.docs.forEach((doc) {
+            playlistList.add(doc.data() as Map<String, dynamic>);
+          });
 
           return SizedBox(
             child: ListView.builder(
