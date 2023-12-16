@@ -3,6 +3,8 @@ import 'package:music_recommendation_with_emotional_analysiss/models/colors.dart
     as custom_colors;
 import 'package:music_recommendation_with_emotional_analysiss/pages/recomendation%20pages/select_singer.dart';
 import 'package:music_recommendation_with_emotional_analysiss/snack_bar.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class SelectGenres extends StatefulWidget {
   final List<String> selectedLanguages;
@@ -163,12 +165,15 @@ class _SelectGenresState extends State<SelectGenres> {
                   onTap: () {
                     setState(() {
                       if (selectedGenres.length >= 3) {
-                        mySnackBar(context, "3 den fazla dil eklenemez");
+                        showTopSnackBar(
+                          Overlay.of(context),
+                          const CustomSnackBar.error(
+                              message: "higher than 3 genres can not be added"),
+                        );
                         return;
                       } else {
                         String genreCode = availableGenres[index];
-                        selectedGenres.add(
-                            genreCode); 
+                        selectedGenres.add(genreCode);
                       }
                     });
                     Navigator.pop(context);
@@ -210,7 +215,11 @@ class _SelectGenresState extends State<SelectGenres> {
             const SizedBox(height: 10),
             Text(
               'Hangi türde şarkı dinlemek istersin? ',
-              style: TextStyle(fontSize: 24, color: custom_colors.pinkPrimary,fontWeight: FontWeight.bold,),
+              style: TextStyle(
+                fontSize: 24,
+                color: custom_colors.pinkPrimary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 10),
             Expanded(
@@ -273,8 +282,7 @@ class _SelectGenresState extends State<SelectGenres> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  backgroundColor: custom_colors
-                      .pinkPrimary, 
+                  backgroundColor: custom_colors.pinkPrimary,
                   foregroundColor: Colors.white,
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -292,15 +300,16 @@ class _SelectGenresState extends State<SelectGenres> {
               child: SizedBox(
                 height: 50,
                 child: FloatingActionButton(
-                  backgroundColor: custom_colors
-                      .pinkPrimary, 
+                  backgroundColor: custom_colors.pinkPrimary,
                   foregroundColor: Colors.white,
                   heroTag: 'aasdsaa',
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => SelectSinger(selectedLanguages: widget.selectedLanguages,selectedGenres:selectedGenres)),
+                          builder: (context) => SelectSinger(
+                              selectedLanguages: widget.selectedLanguages,
+                              selectedGenres: selectedGenres)),
                     );
                   },
                   child: const Row(

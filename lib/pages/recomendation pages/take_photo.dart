@@ -6,6 +6,8 @@ import 'package:music_recommendation_with_emotional_analysiss/models/colors.dart
 import 'package:music_recommendation_with_emotional_analysiss/pages/recomendation%20pages/recommendation_result.dart';
 import 'package:music_recommendation_with_emotional_analysiss/services/music_recommendation_service.dart';
 import 'package:music_recommendation_with_emotional_analysiss/snack_bar.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class TakePhoto extends StatefulWidget {
   final List<String> selectedGenres;
@@ -180,7 +182,11 @@ class _TakePhotoState extends State<TakePhoto> {
                               widget.selectedArtist, widget.selectedGenres);
                         }
                       : () {
-                          mySnackBar(context, "Fotoğrafını çekmeyi unutma!");
+                        showTopSnackBar(
+                          Overlay.of(context),
+                          const CustomSnackBar.error(
+                              message: "Do not forget to take a photo!"),
+                        );
                         },
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,

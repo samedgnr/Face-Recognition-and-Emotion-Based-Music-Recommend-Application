@@ -5,6 +5,8 @@ import 'package:music_recommendation_with_emotional_analysiss/helper/helper_func
 import 'package:music_recommendation_with_emotional_analysiss/pages/play_music_page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/services/database_service.dart';
 import 'package:music_recommendation_with_emotional_analysiss/snack_bar.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import '../models/colors.dart' as custom_colors;
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -237,7 +239,11 @@ class _SearchPageState extends State<SearchPage> {
                               FirebaseAuth.instance.currentUser!.uid,
                               playlistName);
                       Navigator.of(context).pop();
-                      mySnackBar(context, "Playlist created successfully.");
+                      showTopSnackBar(
+                        Overlay.of(context),
+                        const CustomSnackBar.success(
+                            message: "Playlist created successfully."),
+                      );
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -300,8 +306,14 @@ class _SearchPageState extends State<SearchPage> {
                             DatabaseService().addSongs(
                                 snapshot.data.docs[index]['playlistId'],
                                 songData);
-                            mySnackBar(context,
-                                "${snapshot.data.docs[index]['playlistName']} playlistine ${songData["songName"]} şarkısı eklendi");
+
+                            showTopSnackBar(
+                              Overlay.of(context),
+                              CustomSnackBar.success(
+                                  message:
+                                      "${songData["songName"]} has added to ${snapshot.data.docs[index]['playlistName']} successfully"),
+                            );
+
                             Navigator.pop(context);
                           } catch (e) {
                             Exception(e);

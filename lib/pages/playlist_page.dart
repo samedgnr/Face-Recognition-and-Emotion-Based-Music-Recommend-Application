@@ -5,6 +5,8 @@ import 'package:music_recommendation_with_emotional_analysiss/helper/helper_func
 import 'package:music_recommendation_with_emotional_analysiss/pages/play_music_page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/services/database_service.dart';
 import 'package:music_recommendation_with_emotional_analysiss/snack_bar.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import '../models/colors.dart' as custom_colors;
 
 class PlaylistPage extends StatefulWidget {
@@ -54,7 +56,10 @@ class _PlaylistScreenState extends State<PlaylistPage> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          title: Text(playlistName,style: const TextStyle(color: Colors.white),),
+          title: Text(
+            playlistName,
+            style: const TextStyle(color: Colors.white),
+          ),
           actions: [
             IconButton(
                 onPressed: () {
@@ -71,7 +76,7 @@ class _PlaylistScreenState extends State<PlaylistPage> {
                               onPressed: () {
                                 Navigator.pop(context);
                               },
-                              icon:  Icon(
+                              icon: Icon(
                                 Icons.cancel,
                                 color: custom_colors.pinkPrimary,
                               ),
@@ -83,7 +88,7 @@ class _PlaylistScreenState extends State<PlaylistPage> {
                                 Navigator.pop(context);
                                 Navigator.pop(context);
                               },
-                              icon:  Icon(
+                              icon: Icon(
                                 Icons.done,
                                 color: custom_colors.pinkPrimary,
                               ),
@@ -94,7 +99,7 @@ class _PlaylistScreenState extends State<PlaylistPage> {
                 },
                 icon: const Icon(Icons.exit_to_app))
           ],
-           iconTheme: const IconThemeData(color: Colors.white),
+          iconTheme: const IconThemeData(color: Colors.white),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -297,11 +302,11 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
                     decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
                             borderSide:
-                                 BorderSide(color: custom_colors.buttonColor),
+                                BorderSide(color: custom_colors.buttonColor),
                             borderRadius: BorderRadius.circular(20)),
                         errorBorder: OutlineInputBorder(
                             borderSide:
-                                 BorderSide(color: custom_colors.buttonColor),
+                                BorderSide(color: custom_colors.buttonColor),
                             borderRadius: BorderRadius.circular(20)),
                         focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -329,7 +334,11 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
                               FirebaseAuth.instance.currentUser!.uid,
                               playlistName);
                       Navigator.of(context).pop();
-                      mySnackBar(context, "Playlist created successfully.");
+                      showTopSnackBar(
+                        Overlay.of(context),
+                        const CustomSnackBar.info(
+                            message: "Playlist created successfully."),
+                      );
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -371,7 +380,10 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
                     onPressed: () {
                       popUpDialog(context);
                     },
-                    child:  Text('Playlist Oluştur',style: TextStyle(color: custom_colors.buttonColor),),
+                    child: Text(
+                      'Playlist Oluştur',
+                      style: TextStyle(color: custom_colors.buttonColor),
+                    ),
                   ),
                 ),
                 Expanded(
@@ -392,8 +404,13 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
                             DatabaseService().addSongs(
                                 snapshot.data.docs[index]['playlistId'],
                                 songData);
-                            mySnackBar(context,
-                                "${snapshot.data.docs[index]['playlistName']} playlistine ${songData["songName"]} şarkısı eklendi");
+                            showTopSnackBar(
+                              Overlay.of(context),
+                              CustomSnackBar.success(
+                                  message:
+                                      "${songData["songName"]} has added to ${snapshot.data.docs[index]['playlistName']} successfully"),
+                            );
+
                             Navigator.pop(context);
                           } catch (e) {
                             Exception(e);
@@ -434,8 +451,14 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
                   try {
                     DatabaseService().deleteSongPlaylist(
                         widget.playlistId, songData["songId"]);
-                    mySnackBar(context,
-                        " ${songData["songName"]} şarkısı playlistten kaldırıldı.");
+
+                    showTopSnackBar(
+                      Overlay.of(context),
+                      CustomSnackBar.success(
+                          message:
+                              "${songData["songName"]} has deleted successfully"),
+                    );
+
                     Navigator.pop(context);
                   } catch (e) {
                     Exception(e);

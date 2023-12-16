@@ -7,7 +7,6 @@ import 'package:music_recommendation_with_emotional_analysiss/pages/playlist_pag
 import 'package:music_recommendation_with_emotional_analysiss/pages/profile_page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/recomendation%20pages/select_languagee.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/settings%20page/setting_body.dart';
-import 'package:music_recommendation_with_emotional_analysiss/snack_bar.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import '../models/colors.dart' as custom_colors;
@@ -197,9 +196,9 @@ class _HomePageState extends State<HomePage> {
                                 songData);
                             showTopSnackBar(
                               Overlay.of(context),
-                              CustomSnackBar.info(
+                              CustomSnackBar.success(
                                   message:
-                                      "${snapshot.data.docs[index]['playlistName']} playlistine ${songData["songName"]} şarkısı eklendi"),
+                                      "${songData["songName"]} has added to ${snapshot.data.docs[index]['playlistName']} successfully"),
                             );
                             Navigator.pop(context);
                           } catch (e) {

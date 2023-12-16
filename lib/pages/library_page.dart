@@ -5,7 +5,8 @@ import 'package:music_recommendation_with_emotional_analysiss/helper/helper_func
 import 'package:music_recommendation_with_emotional_analysiss/pages/playlist_page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/search_delegate.dart';
 import 'package:music_recommendation_with_emotional_analysiss/services/database_service.dart';
-import 'package:music_recommendation_with_emotional_analysiss/snack_bar.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import '../models/colors.dart' as custom_colors;
 
 class MyPlaylistsPage extends StatefulWidget {
@@ -122,7 +123,11 @@ class _MyPlaylistPageState extends State<MyPlaylistsPage> {
                               FirebaseAuth.instance.currentUser!.uid,
                               playlistName);
                       Navigator.of(context).pop();
-                      mySnackBar(context, "Playlist created successfully.");
+                      showTopSnackBar(
+                          Overlay.of(context),
+                          const CustomSnackBar.success(
+                              message: "Playlist created successfully."),
+                        );
                     }
                   },
                   style: ElevatedButton.styleFrom(

@@ -3,6 +3,8 @@ import 'package:music_recommendation_with_emotional_analysiss/models/colors.dart
     as custom_colors;
 import 'package:music_recommendation_with_emotional_analysiss/pages/recomendation%20pages/select_genres.dart';
 import 'package:music_recommendation_with_emotional_analysiss/snack_bar.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class SelectLanguagee extends StatefulWidget {
 const SelectLanguagee({Key? key}) : super(key: key);
@@ -63,7 +65,11 @@ class _SelectLanguageeState extends State<SelectLanguagee> {
                   onTap: () {
                     setState(() {
                       if (selectedLanguage.length >= 5) {
-                        mySnackBar(context, "5 den fazla dil eklenemez");
+                        showTopSnackBar(
+                          Overlay.of(context),
+                          const CustomSnackBar.error(
+                              message: "higher than 5 languages can not be added"),
+                        );
                         return;
                       } else {}
                       String languageCode = availableLanguage[language]!;

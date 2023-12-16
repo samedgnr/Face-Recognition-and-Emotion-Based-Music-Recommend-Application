@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:music_recommendation_with_emotional_analysiss/helper/helper_function.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/play_music_page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/services/database_service.dart';
-import 'package:music_recommendation_with_emotional_analysiss/snack_bar.dart';
 import 'package:music_recommendation_with_emotional_analysiss/models/colors.dart'
     as custom_colors;
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class RecommendationResult extends StatefulWidget {
   final List<dynamic> recommendedSongs;
@@ -117,13 +118,20 @@ class _RecommendationResultState extends State<RecommendationResult> {
                     setState(() {
                       addToPlaylist(myPlaylistId!, widget.recommendedSongs);
                     });
-
-                    mySnackBar(context, "Playlist Oluşturuldu");
+                    showTopSnackBar(
+                      Overlay.of(context),
+                      const CustomSnackBar.success(
+                          message: "Playlist created successfully."),
+                    );
                   } else {
                     if (myPlaylistId != null) {
                       setState(() {
                         DatabaseService().deletePlaylist(myPlaylistId!);
-                        mySnackBar(context, "Playlist Silindi");
+                        showTopSnackBar(
+                          Overlay.of(context),
+                          const CustomSnackBar.success(
+                              message: "Playlist deleted successfully."),
+                        );
                       });
                     }
                   }
@@ -220,8 +228,12 @@ class _RecommendationResultState extends State<RecommendationResult> {
                                   setState(() {
                                     widget.recommendedSongs.removeAt(index);
                                   });
-                                  mySnackBar(context,
-                                      "${result['name']} şarkısı silindi");
+                                  showTopSnackBar(
+                                    Overlay.of(context),
+                                    CustomSnackBar.success(
+                                        message:
+                                            "${result['name']} song has deleted successfully"),
+                                  );
                                 },
                                 child: Icon(
                                   Icons.delete,
@@ -299,7 +311,11 @@ class _RecommendationResultState extends State<RecommendationResult> {
                               FirebaseAuth.instance.currentUser!.uid,
                               playlistName);
                       Navigator.of(context).pop();
-                      mySnackBar(context, "Playlist created successfully.");
+                      showTopSnackBar(
+                        Overlay.of(context),
+                        const CustomSnackBar.success(
+                            message: "Playlist created successfully."),
+                      );
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -362,8 +378,14 @@ class _RecommendationResultState extends State<RecommendationResult> {
                             DatabaseService().addSongs(
                                 snapshot.data.docs[index]['playlistId'],
                                 songData);
-                            mySnackBar(context,
-                                "${snapshot.data.docs[index]['playlistName']} playlistine ${songData["songName"]} şarkısı eklendi");
+
+                            showTopSnackBar(
+                              Overlay.of(context),
+                              CustomSnackBar.success(
+                                  message:
+                                      "${songData["songName"]} has added to ${snapshot.data.docs[index]['playlistName']} successfully"),
+                            );
+
                             Navigator.pop(context);
                           } catch (e) {
                             Exception(e);
