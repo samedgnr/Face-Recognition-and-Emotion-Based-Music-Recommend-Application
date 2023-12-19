@@ -581,8 +581,9 @@ class _HomePageState extends State<HomePage> {
                                       await EmotionDetectionService
                                           .getRecommendations(
                                     "Neutral",
-                                    ["pop","rock"],
-                                    ["sadadssad"],
+                                    ["rock"],
+                                    ["duman"],
+                                    "turkish",
                                   );
 
                                   if (result.isNotEmpty) {
@@ -638,7 +639,8 @@ class _HomePageState extends State<HomePage> {
                                           .getRecommendations(
                                     "Happy",
                                     ["pop"],
-                                    ["dasasda"],
+                                    ["tarkan"],
+                                    "turkish",
                                   );
 
                                   if (result.isNotEmpty) {
@@ -692,7 +694,8 @@ class _HomePageState extends State<HomePage> {
                                           .getRecommendations(
                                     "Sad",
                                     ["rock"],
-                                    ["dsaads"],
+                                    ["dire straits"],
+                                    "turkish",
                                   );
 
                                   if (result.isNotEmpty) {

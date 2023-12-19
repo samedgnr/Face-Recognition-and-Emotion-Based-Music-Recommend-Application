@@ -11,9 +11,9 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 class TakePhoto extends StatefulWidget {
   final List<String> selectedGenres;
   final List<String> selectedArtist;
-
+  final String selectedLanguage;
   const TakePhoto(
-      {super.key, required this.selectedGenres, required this.selectedArtist});
+      {super.key, required this.selectedGenres, required this.selectedArtist, required this.selectedLanguage});
 
   @override
   State<TakePhoto> createState() => _TakePhotoState();
@@ -70,7 +70,7 @@ class _TakePhotoState extends State<TakePhoto> {
     }
   }
 
-  void getRecommendations(List<String> artist, List<String> genre) async {
+  void getRecommendations(List<String> artist, List<String> genre,String language) async {
     try {
       List<String> artists = artist;
       List<String> genres = genre;
@@ -82,6 +82,7 @@ class _TakePhotoState extends State<TakePhoto> {
         emotion,
         genres,
         artists,
+        language,
       );
 
       if (result.isNotEmpty) {
@@ -221,7 +222,7 @@ class _TakePhotoState extends State<TakePhoto> {
                       ? () {
                           print(emotion);
                           getRecommendations(
-                              widget.selectedArtist, widget.selectedGenres);
+                              widget.selectedArtist, widget.selectedGenres,widget.selectedLanguage);
                         }
                       : () {
                           print(emotion);

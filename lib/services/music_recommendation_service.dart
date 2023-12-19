@@ -24,18 +24,21 @@ class EmotionDetectionService {
   }
 
   static Future<Map<String, dynamic>> getRecommendations(
-      String emotion, List<String> genre, List<String> artist) async {
+      String emotion, List<String> genre, List<String> artist,String language) async {
     List<String> artists = artist;
     List<String> genres = genre;
+    String genree = "${language.toLowerCase()} ${genre[0].toLowerCase()}"  ;
     print(genres);
     print(artists);
+    print(language);
     final response = await http.post(
       Uri.parse('$baseUrl/get_recommendations'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'emotion': emotion,
         'artist_names': artists,
-        'genres': genres,
+        'genres': genree.split(","),
+        
       }),
     );
 
@@ -45,6 +48,31 @@ class EmotionDetectionService {
       throw Exception('Failed to get recommendations');
     }
   }
+
+   static Future<List<Map<String, dynamic>>> getTopArtists(language,genre) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://10.0.2.2:5000/get_top_artists'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'market': language,
+          'genre': genre,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return List<Map<String, dynamic>>.from(data['result']);
+      } else {
+        throw Exception('Failed to get top artists');
+      }
+    } catch (e) {
+      throw Exception('Failed to get top artists: $e');
+    }
+  }
+  
+
+
 
   static Future<Map<String, dynamic>> getArtistInfo(String artistName) async {
     try {

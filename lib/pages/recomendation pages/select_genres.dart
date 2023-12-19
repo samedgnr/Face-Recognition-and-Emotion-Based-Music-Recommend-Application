@@ -145,7 +145,7 @@ class _SelectGenresState extends State<SelectGenres> {
     'world-music'
   ];
 
-  List<String> selectedGenres = ['Pop', 'Rock', 'Hip-Hop'];
+  List<String> selectedGenres = ['Pop'];
 
   void _showLanguageDialog() {
     showDialog(
@@ -163,11 +163,11 @@ class _SelectGenresState extends State<SelectGenres> {
                   title: Text(availableGenres[index]),
                   onTap: () {
                     setState(() {
-                      if (selectedGenres.length >= 5) {
+                      if (selectedGenres.length >= 1) {
                         showTopSnackBar(
                           Overlay.of(context),
                           const CustomSnackBar.error(
-                              message: "higher than 5 genres can not be added"),
+                              message: "higher than 1 genres can not be added"),
                         );
                         return;
                       } else {
@@ -250,7 +250,7 @@ class _SelectGenresState extends State<SelectGenres> {
             ),
             const SizedBox(height: 10),
             Padding(
-              padding: const EdgeInsets.fromLTRB(10, 0, 0, 200),
+              padding: const EdgeInsets.fromLTRB(10, 0, 0, 470),
               child: SizedBox(
                 height: 50,
                 width: 100,
@@ -259,7 +259,7 @@ class _SelectGenresState extends State<SelectGenres> {
                   onPressed: _showLanguageDialog,
                   backgroundColor: custom_colors.pinkPrimary,
                   child: const Text(
-                    'Tür Ekle',
+                    'Tür Değiştir',
                     style: TextStyle(color: Colors.white),
                   ),
                 ),

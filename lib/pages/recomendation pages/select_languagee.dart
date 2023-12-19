@@ -6,45 +6,45 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class SelectLanguagee extends StatefulWidget {
-const SelectLanguagee({Key? key}) : super(key: key);
+  const SelectLanguagee({Key? key}) : super(key: key);
 
   @override
   State<SelectLanguagee> createState() => _SelectLanguageeState();
 }
 
 class _SelectLanguageeState extends State<SelectLanguagee> {
-  Map<String, String> availableLanguage = {
-    'English': 'EN',
-    'Spanish': 'ES',
-    'Chinese': 'ZH',
-    'Hindi': 'HI',
-    'Arabic': 'AR',
-    'Portuguese': 'PT',
-    'Bengali': 'BN',
-    'Russian': 'RU',
-    'Japanese': 'JA',
-    'Punjabi': 'PA',
-    'German': 'DE',
-    'Javanese': 'JV',
-    'Telugu': 'TE',
-    'Marathi': 'MR',
-    'Turkish': 'TR',
-    'Tamil': 'TA',
-    'Urdu': 'UR',
-    'Gujarati': 'GU',
-    'Malayalam': 'ML',
-    'Kannada': 'KN',
-    'Oriya': 'OR',
-    'Sunda': 'SU',
-    'Bhojpuri': 'BH',
-    'Hausa': 'HA',
-    'Tagalog': 'TL',
-    'Yoruba': 'YO',
-    'Maithili': 'MAI',
-    'Ukrainian': 'UK',
-  };
+  List<String> availableLanguage = [
+    'English',
+    'Spanish',
+    'Chinese',
+    'Hindi',
+    'Arabic',
+    'Portuguese',
+    'Bengali',
+    'Russian',
+    'Japanese',
+    'Punjabi',
+    'German',
+    'Javanese',
+    'Telugu',
+    'Marathi',
+    'Turkish',
+    'Tamil',
+    'Urdu',
+    'Gujarati',
+    'Malayalam',
+    'Kannada',
+    'Oriya',
+    'Sunda',
+    'Bhojpuri',
+    'Hausa',
+    'Tagalog',
+    'Yoruba',
+    'Maithili',
+    'Ukrainian',
+  ];
 
-  Map<String, String> selectedLanguage = {'Turkish': 'TR'};
+  List<String> selectedLanguage = ['Turkish'];
 
   void _showLanguageDialog() {
     showDialog(
@@ -58,7 +58,7 @@ class _SelectLanguageeState extends State<SelectLanguagee> {
             child: ListView.builder(
               itemCount: availableLanguage.length,
               itemBuilder: (context, index) {
-                String language = availableLanguage.keys.elementAt(index);
+                String language = availableLanguage.elementAt(index);
                 return ListTile(
                   title: Text(language),
                   onTap: () {
@@ -67,12 +67,14 @@ class _SelectLanguageeState extends State<SelectLanguagee> {
                         showTopSnackBar(
                           Overlay.of(context),
                           const CustomSnackBar.error(
-                              message: "higher than 1 languages can not be added"),
+                            message: "Higher than 1 language cannot be added",
+                          ),
                         );
                         return;
-                      } else {}
-                      String languageCode = availableLanguage[language]!;
-                      selectedLanguage[language] = languageCode;
+                      }
+                      String languageCode = availableLanguage[index];
+                      selectedLanguage.add(
+                          languageCode); 
                     });
                     Navigator.pop(context);
                   },
@@ -128,7 +130,7 @@ class _SelectLanguageeState extends State<SelectLanguagee> {
               child: ListView.builder(
                 itemCount: selectedLanguage.length,
                 itemBuilder: (context, index) {
-                  String language = selectedLanguage.keys.elementAt(index);
+                  String language = selectedLanguage.elementAt(index);
                   return ListTile(
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -137,7 +139,6 @@ class _SelectLanguageeState extends State<SelectLanguagee> {
                         Hero(
                           tag: UniqueKey(),
                           child: IconButton(
-                            
                             icon: const Icon(Icons.delete),
                             onPressed: () {
                               setState(() {
@@ -163,7 +164,7 @@ class _SelectLanguageeState extends State<SelectLanguagee> {
                   onPressed: _showLanguageDialog,
                   backgroundColor: custom_colors.pinkPrimary,
                   child: const Text(
-                    'Dil Ekle',
+                    'Dil Değiştir',
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -184,11 +185,12 @@ class _SelectLanguageeState extends State<SelectLanguagee> {
                 child: FloatingActionButton(
                   heroTag: 'aa',
                   onPressed: () {
-                    print(selectedLanguage.values.toList());
+                    print(selectedLanguage.toList());
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) =>  SelectGenres(selectedLanguages: selectedLanguage.values.toList())),
+                          builder: (context) => SelectGenres(
+                              selectedLanguages: selectedLanguage.toList())),
                     );
                   },
                   backgroundColor: custom_colors.pinkPrimary,

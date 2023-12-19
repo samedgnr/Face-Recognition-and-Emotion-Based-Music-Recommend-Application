@@ -22,99 +22,29 @@ class _SelectSingerState extends State<SelectSinger> {
   List<String> availableArtist = [];
   List<String> selectedArtists = [];
 
-  List<Map<String, dynamic>> singerList = [
-    {
-      'id': '4IJczjB0fJ04gs4uvP0Fli',
-      'name': 'Gym Class Heroes',
-      'icon':
-          'https://i.scdn.co/image/ab6761610000e5eb2b128023b3a465eb11c8d204',
-      'followers': 1483853,
-    },
-    {
-      'id': '04gDigrS5kc9YWfZHwBETP',
-      'name': 'Maroon 5',
-      'icon':
-          'https://i.scdn.co/image/ab6761610000e5ebf8349dfb619a7f842242de77',
-      'followers': 42006684,
-    },
-    {
-      'id': '1vCWHaC5f2uS3yhpwWbIA6',
-      'name': 'Avicii',
-      'icon':
-          'https://i.scdn.co/image/ab6761610000e5ebae07171f989fb39736674113',
-      'followers': 23301041,
-    },
-    {
-      'id': '4IJczjB0fJ04gs4uvP0Fli',
-      'name': 'ddsad',
-      'icon':
-          'https://i.scdn.co/image/ab6761610000e5eb2b128023b3a465eb11c8d204',
-      'followers': 1483853,
-    },
-    {
-      'id': '04gDigrS5kc9YWfZHwBETP',
-      'name': 'asdasddadas',
-      'icon':
-          'https://i.scdn.co/image/ab6761610000e5ebf8349dfb619a7f842242de77',
-      'followers': 42006684,
-    },
-    {
-      'id': '1vCWHaC5f2uS3yhpwWbIA6',
-      'name': 'dsadsaadsads',
-      'icon':
-          'https://i.scdn.co/image/ab6761610000e5ebae07171f989fb39736674113',
-      'followers': 23301041,
-    },
-    {
-      'id': '4IJczjB0fJ04gs4uvP0Fli',
-      'name': 'adsadsaddas',
-      'icon':
-          'https://i.scdn.co/image/ab6761610000e5eb2b128023b3a465eb11c8d204',
-      'followers': 1483853,
-    },
-    {
-      'id': '04gDigrS5kc9YWfZHwBETP',
-      'name': 'Masd',
-      'icon':
-          'https://i.scdn.co/image/ab6761610000e5ebf8349dfb619a7f842242de77',
-      'followers': 42006684,
-    },
-    {
-      'id': '1vCWHaC5f2uS3yhpwWbIA6',
-      'name': 'Adasdaadsdas',
-      'icon':
-          'https://i.scdn.co/image/ab6761610000e5ebae07171f989fb39736674113',
-      'followers': 23301041,
-    },
-    {
-      'id': '1vCWHaC5f2uS3yhpwWbIA6',
-      'name': 'dsadsaadsads',
-      'icon':
-          'https://i.scdn.co/image/ab6761610000e5ebae07171f989fb39736674113',
-      'followers': 23301041,
-    },
-    {
-      'id': '4IJczjB0fJ04gs4uvP0Fli',
-      'name': 'adsadsaddas',
-      'icon':
-          'https://i.scdn.co/image/ab6761610000e5eb2b128023b3a465eb11c8d204',
-      'followers': 1483853,
-    },
-    {
-      'id': '04gDigrS5kc9YWfZHwBETP',
-      'name': 'Masd',
-      'icon':
-          'https://i.scdn.co/image/ab6761610000e5ebf8349dfb619a7f842242de77',
-      'followers': 42006684,
-    },
-    {
-      'id': '1vCWHaC5f2uS3yhpwWbIA6',
-      'name': 'Adasdaadsdas',
-      'icon':
-          'https://i.scdn.co/image/ab6761610000e5ebae07171f989fb39736674113',
-      'followers': 23301041,
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    initializeSingerList();
+  }
+
+  List<Map<String, dynamic>> singerList = [];
+
+  Future<void> initializeSingerList() async {
+    try {
+      final List<Map<String, dynamic>> topArtists =
+          await EmotionDetectionService.getTopArtists(
+        widget.selectedLanguages[0],
+        widget.selectedGenres[0],
+      );
+
+      setState(() {
+        singerList = topArtists;
+      });
+    } catch (e) {
+      print('Error initializing singerList: $e');
+    }
+  }
 
   void showSelectedArtistDialog(String selectedArtist) async {
     TextEditingController artistNameController = TextEditingController();
@@ -232,12 +162,12 @@ class _SelectSingerState extends State<SelectSinger> {
                                       ],
                                     ),
                                     onTap: () {
-                                      if (selectedArtists.length >= 5) {
+                                      if (selectedArtists.length >= 4) {
                                         showTopSnackBar(
                                           Overlay.of(context),
                                           const CustomSnackBar.error(
                                             message:
-                                                "Higher than 5 singers cannot be added",
+                                                "Higher than 4 singers cannot be added",
                                           ),
                                         );
                                       } else {
@@ -254,7 +184,7 @@ class _SelectSingerState extends State<SelectSinger> {
                                           );
                                         } else {
                                           selectedArtists
-                                              .add(selectedArtistName);
+                                              .add(artistInfo['name']);
                                           setState(() {
                                             singerList.insert(0, {
                                               'id': artistInfo['id'],
@@ -364,11 +294,11 @@ class _SelectSingerState extends State<SelectSinger> {
                       if (isSelected) {
                         selectedArtists.remove(singer['name']);
                       } else {
-                        if (selectedArtists.length >= 5) {
+                        if (selectedArtists.length >= 4) {
                           showTopSnackBar(
                             Overlay.of(context),
                             const CustomSnackBar.error(
-                              message: "higher than 5 singer can not be added",
+                              message: "higher than 4 singer can not be added",
                             ),
                           );
                         } else {
@@ -435,11 +365,11 @@ class _SelectSingerState extends State<SelectSinger> {
               child: FloatingActionButton(
                 heroTag: 'aaa',
                 onPressed: () {
-                  if (selectedArtists.length >= 5) {
+                  if (selectedArtists.length >= 4) {
                     showTopSnackBar(
                       Overlay.of(context),
                       const CustomSnackBar.error(
-                        message: "Higher than 5 singers cannot be added",
+                        message: "Higher than 4 singers cannot be added",
                       ),
                     );
                   } else {
@@ -496,8 +426,10 @@ class _SelectSingerState extends State<SelectSinger> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => TakePhoto(
-                              selectedGenres: widget.selectedGenres,
-                              selectedArtist: selectedArtists)),
+                                selectedGenres: widget.selectedGenres,
+                                selectedArtist: selectedArtists,
+                                selectedLanguage: widget.selectedLanguages[0],
+                              )),
                     );
                   },
                   child: const Row(
