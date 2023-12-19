@@ -164,11 +164,11 @@ class _SelectGenresState extends State<SelectGenres> {
                   title: Text(availableGenres[index]),
                   onTap: () {
                     setState(() {
-                      if (selectedGenres.length >= 3) {
+                      if (selectedGenres.length >= 5) {
                         showTopSnackBar(
                           Overlay.of(context),
                           const CustomSnackBar.error(
-                              message: "higher than 3 genres can not be added"),
+                              message: "higher than 5 genres can not be added"),
                         );
                         return;
                       } else {
@@ -251,7 +251,7 @@ class _SelectGenresState extends State<SelectGenres> {
             ),
             const SizedBox(height: 10),
             Padding(
-              padding: const EdgeInsets.fromLTRB(10, 0, 0, 350),
+              padding: const EdgeInsets.fromLTRB(10, 0, 0, 200),
               child: SizedBox(
                 height: 50,
                 width: 100,

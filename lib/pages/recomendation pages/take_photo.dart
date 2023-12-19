@@ -5,13 +5,13 @@ import 'package:music_recommendation_with_emotional_analysiss/models/colors.dart
     as custom_colors;
 import 'package:music_recommendation_with_emotional_analysiss/pages/recomendation%20pages/recommendation_result.dart';
 import 'package:music_recommendation_with_emotional_analysiss/services/music_recommendation_service.dart';
-import 'package:music_recommendation_with_emotional_analysiss/snack_bar.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class TakePhoto extends StatefulWidget {
   final List<String> selectedGenres;
   final List<String> selectedArtist;
+
   const TakePhoto(
       {super.key, required this.selectedGenres, required this.selectedArtist});
 
@@ -20,9 +20,25 @@ class TakePhoto extends StatefulWidget {
 }
 
 class _TakePhotoState extends State<TakePhoto> {
-  late Uint8List imageBytes;
+  late Uint8List? imageBytes;
   String emotion = '';
   bool isImageSelected = false;
+
+  List<String> emotionList = [
+    'Happy',
+    'Sad',
+    'Angry',
+    'Neutral',
+    'Surprised',
+    'Disgusted',
+    'Fearful',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    imageBytes = null;
+  }
 
   Future<void> getImage() async {
     final picker = ImagePicker();
@@ -39,10 +55,10 @@ class _TakePhotoState extends State<TakePhoto> {
   }
 
   Future<void> processImage() async {
-    if (imageBytes.isNotEmpty) {
+    if (imageBytes != null && imageBytes!.isNotEmpty) {
       try {
         Map<String, dynamic> result =
-            await EmotionDetectionService.processImage(imageBytes);
+            await EmotionDetectionService.processImage(imageBytes!);
         setState(() {
           emotion = result['emotion'];
         });
@@ -92,7 +108,7 @@ class _TakePhotoState extends State<TakePhoto> {
       appBar: AppBar(
         backgroundColor: custom_colors.pinkPrimary,
         title: const Text(
-          "photo",
+          "Emotion Detection",
           style: TextStyle(color: Colors.white),
         ),
         elevation: 4,
@@ -106,40 +122,63 @@ class _TakePhotoState extends State<TakePhoto> {
           child: Container(),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            const SizedBox(height: 10),
-            Text(
-              'Son olarak fotoğrafını çekelim! ',
-              style: TextStyle(
-                fontSize: 24,
-                color: custom_colors.pinkPrimary,
-                fontWeight: FontWeight.bold,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              const SizedBox(height: 10),
+              Text(
+                'Son olarak fotoğrafını çekelim! ',
+                style: TextStyle(
+                  fontSize: 24,
+                  color: custom_colors.pinkPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 70),
-            Center(
-              child: SizedBox(
-                height: 200,
-                width: 200,
-                child: FloatingActionButton(
-                  heroTag: 'adsaa',
-                  onPressed: () async {
-                    await getImage();
-                  },
-                  backgroundColor: custom_colors.pinkPrimary,
-                  child: const Icon(
-                    Icons.camera_alt,
-                    size: 100,
-                    color: Colors.white,
+              const SizedBox(height: 30),
+              Center(
+                child: SizedBox(
+                  height: 150,
+                  width: 150,
+                  child: FloatingActionButton(
+                    heroTag: 'adsaa',
+                    onPressed: () async {
+                      await getImage();
+                    },
+                    backgroundColor: custom_colors.pinkPrimary,
+                    child: const Icon(
+                      Icons.camera_alt,
+                      size: 70,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 30),
+              Text(
+                'Fotoğraf çekmek istemiyorsan aşağıdan istediğin duygu durumunu da seçebilirsin!',
+                style: TextStyle(
+                  fontSize: 24,
+                  color: custom_colors.pinkPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                height: 230,
+                child: Center(
+                  child: ListView.builder(
+                    itemCount: emotionList.length,
+                    itemBuilder: (context, index) {
+                      return buildEmotionButton(emotionList[index]);
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
       floatingActionButton: Padding(
@@ -173,20 +212,24 @@ class _TakePhotoState extends State<TakePhoto> {
               child: SizedBox(
                 height: 50,
                 child: FloatingActionButton(
-                  backgroundColor: isImageSelected ? Colors.green : Colors.red,
+                  backgroundColor: emotion != "" || isImageSelected
+                      ? Colors.green
+                      : Colors.red,
                   foregroundColor: Colors.white,
                   heroTag: 'aasdsaa',
-                  onPressed: isImageSelected
+                  onPressed: emotion != "" || isImageSelected
                       ? () {
+                          print(emotion);
                           getRecommendations(
                               widget.selectedArtist, widget.selectedGenres);
                         }
                       : () {
-                        showTopSnackBar(
-                          Overlay.of(context),
-                          const CustomSnackBar.error(
-                              message: "Do not forget to take a photo!"),
-                        );
+                          print(emotion);
+                          showTopSnackBar(
+                            Overlay.of(context),
+                            const CustomSnackBar.error(
+                                message: "Do not forget to take a photo!"),
+                          );
                         },
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -200,6 +243,49 @@ class _TakePhotoState extends State<TakePhoto> {
                     ],
                   ),
                 ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildEmotionButton(String emotionn) {
+    bool isSelected = emotion == emotionn;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      child: TextButton(
+        onPressed: () {
+          setState(() {
+            if (isSelected) {
+              isImageSelected = false;
+              emotion = "";
+            } else {
+              emotion = emotionn;
+              imageBytes = null;
+            }
+          });
+        },
+        style: TextButton.styleFrom(
+          backgroundColor:
+              isSelected ? Colors.green : custom_colors.pinkPrimary,
+          padding: const EdgeInsets.all(16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              emotionn,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],

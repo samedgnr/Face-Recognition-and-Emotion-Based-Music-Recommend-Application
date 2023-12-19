@@ -45,7 +45,7 @@ class _SelectLanguageeState extends State<SelectLanguagee> {
     'Ukrainian': 'UK',
   };
 
-  Map<String, String> selectedLanguage = {'Turkish': 'TR', 'English': 'EN'};
+  Map<String, String> selectedLanguage = {'Turkish': 'TR'};
 
   void _showLanguageDialog() {
     showDialog(
@@ -64,11 +64,11 @@ class _SelectLanguageeState extends State<SelectLanguagee> {
                   title: Text(language),
                   onTap: () {
                     setState(() {
-                      if (selectedLanguage.length >= 5) {
+                      if (selectedLanguage.length >= 1) {
                         showTopSnackBar(
                           Overlay.of(context),
                           const CustomSnackBar.error(
-                              message: "higher than 5 languages can not be added"),
+                              message: "higher than 1 languages can not be added"),
                         );
                         return;
                       } else {}
@@ -155,7 +155,7 @@ class _SelectLanguageeState extends State<SelectLanguagee> {
             ),
             const SizedBox(height: 10),
             Padding(
-              padding: const EdgeInsets.fromLTRB(10, 0, 0, 180),
+              padding: const EdgeInsets.fromLTRB(10, 0, 0, 430),
               child: SizedBox(
                 height: 50,
                 width: 100,

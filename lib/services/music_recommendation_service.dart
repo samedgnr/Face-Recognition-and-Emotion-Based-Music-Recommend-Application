@@ -45,4 +45,25 @@ class EmotionDetectionService {
       throw Exception('Failed to get recommendations');
     }
   }
+
+  static Future<Map<String, dynamic>> getArtistInfo(String artistName) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/get_artist_info'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'artist_name': artistName,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to get artist info');
+      }
+    } catch (e) {
+      print('Exception during getArtistInfo: $e');
+      throw Exception('Failed to get artist info');
+    }
+  }
 }

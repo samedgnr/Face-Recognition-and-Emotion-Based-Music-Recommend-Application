@@ -1,12 +1,18 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:music_recommendation_with_emotional_analysiss/helper/helper_function.dart';
+import 'package:music_recommendation_with_emotional_analysiss/pages/creat_music_page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/play_music_page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/playlist_page.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/profile_page.dart';
+import 'package:music_recommendation_with_emotional_analysiss/pages/recomendation%20pages/recommendation_result.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/recomendation%20pages/select_languagee.dart';
 import 'package:music_recommendation_with_emotional_analysiss/pages/settings%20page/setting_body.dart';
+import 'package:music_recommendation_with_emotional_analysiss/pages/voice_commands_page.dart';
+import 'package:music_recommendation_with_emotional_analysiss/services/music_recommendation_service.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import '../models/colors.dart' as custom_colors;
@@ -263,19 +269,7 @@ class _HomePageState extends State<HomePage> {
           title: const Text('SpoCV', style: TextStyle(color: Colors.white)),
           centerTitle: true,
           iconTheme: const IconThemeData(color: Colors.white),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.camera_alt),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const SelectLanguagee()),
-                );
-              },
-              color: Colors.white,
-            ),
-          ],
+          
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -462,42 +456,285 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
               Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Container(
+                padding: const EdgeInsets.fromLTRB(2, 22, 0, 0),
+                child: Text(
+                  'Music With Your Feelings!',
+                  style: TextStyle(
+                    fontSize: 24,
+                    color: custom_colors.pinkPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 8, 16),
+                child: SizedBox(
                   height: 210,
-                  child: Row(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
-                      Expanded(
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: 3, // 3 kart olacak
-                          itemBuilder: (context, index) {
-                            return Card(
-                              child: ListTile(
-                                title: Text('Kart ${index + 1}'),
-                                // Kart içeriği burada eklenebilir
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          SizedBox(
+                            height: 50,
+                            width: 180,
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const SelectLanguagee(),
+                                  ),
+                                );
+                              },
+                              icon: const Icon(
+                                Icons.camera_alt,
+                                color: Colors.white,
                               ),
-                            );
-                          },
-                        ),
+                              label: const Text(
+                                'Music Suggestion',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: custom_colors.pinkPrimary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 6,
+                          ),
+                          SizedBox(
+                            height: 50,
+                            width: 180,
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const CreateMusic(),
+                                  ),
+                                );
+                              },
+                              icon: const Icon(
+                                Icons.music_note,
+                                color: Colors.white,
+                              ),
+                              label: const Text(
+                                'Create Music Ai',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: custom_colors.pinkPrimary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      Expanded(
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: 3, // 3 kart olacak
-                          itemBuilder: (context, index) {
-                            return Card(
-                              child: ListTile(
-                                title: Text('Kart ${index + 1}'),
-                                // Kart içeriği burada eklenebilir
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          SizedBox(
+                            height: 50,
+                            width: 180,
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const VoiceCommands(),
+                                  ),
+                                );
+                              },
+                              icon: const Icon(
+                                Icons.mic,
+                                color: Colors.white,
                               ),
-                            );
-                          },
-                        ),
+                              label: const Text(
+                                'Voice Commands',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: custom_colors.pinkPrimary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 6,
+                          ),
+                          SizedBox(
+                            height: 50,
+                            width: 180,
+                            child: ElevatedButton.icon(
+                              onPressed: () async {
+                                try {
+                                  Map<String, dynamic> result =
+                                      await EmotionDetectionService
+                                          .getRecommendations(
+                                    "Neutral",
+                                    ["pop","rock"],
+                                    ["sadadssad"],
+                                  );
+
+                                  if (result.isNotEmpty) {
+                                    // ignore: use_build_context_synchronously
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            RecommendationResult(
+                                          recommendedSongs:
+                                              result['recommendations'],
+                                          emotion: "Neutral",
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    print(
+                                        'No recommendations found in the result');
+                                  }
+                                } catch (e) {
+                                  print('Error getting recommendations: $e');
+                                }
+                              },
+                              icon: const Icon(
+                                Icons.playlist_add,
+                                color: Colors.white,
+                              ),
+                              label: const Text(
+                                'Neutral Playlist',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: custom_colors.pinkPrimary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          SizedBox(
+                            height: 50,
+                            width: 180,
+                            child: ElevatedButton.icon(
+                              onPressed: () async {
+                                try {
+                                  Map<String, dynamic> result =
+                                      await EmotionDetectionService
+                                          .getRecommendations(
+                                    "Happy",
+                                    ["pop"],
+                                    ["dasasda"],
+                                  );
+
+                                  if (result.isNotEmpty) {
+                                    // ignore: use_build_context_synchronously
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            RecommendationResult(
+                                          recommendedSongs:
+                                              result['recommendations'],
+                                          emotion: "Happy",
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    print(
+                                        'No recommendations found in the result');
+                                  }
+                                } catch (e) {
+                                  print('Error getting recommendations: $e');
+                                }
+                              },
+                              icon: const Icon(
+                                Icons.playlist_add,
+                                color: Colors.white,
+                              ),
+                              label: const Text(
+                                'Happy Playlist',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: custom_colors.pinkPrimary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 6,
+                          ),
+                          SizedBox(
+                            height: 50,
+                            width: 180,
+                            child: ElevatedButton.icon(
+                              onPressed: () async {
+                                try {
+                                  Map<String, dynamic> result =
+                                      await EmotionDetectionService
+                                          .getRecommendations(
+                                    "Sad",
+                                    ["rock"],
+                                    ["dsaads"],
+                                  );
+
+                                  if (result.isNotEmpty) {
+                                    // ignore: use_build_context_synchronously
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            RecommendationResult(
+                                          recommendedSongs:
+                                              result['recommendations'],
+                                          emotion: "Sad",
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    print(
+                                        'No recommendations found in the result');
+                                  }
+                                } catch (e) {
+                                  print('Error getting recommendations: $e');
+                                }
+                              },
+                              icon: const Icon(
+                                Icons.playlist_add,
+                                color: Colors.white,
+                              ),
+                              label: const Text(
+                                'Sad Playlist',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: custom_colors.pinkPrimary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -578,8 +815,7 @@ class _HomePageState extends State<HomePage> {
                               : snapshot.data.docs.length;
 
                           return Container(
-                            height: 70 * itemCount.toDouble() +
-                                750, 
+                            height: 70 * itemCount.toDouble() + 750,
                             child: Column(
                               children: [
                                 ListView.builder(

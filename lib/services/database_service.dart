@@ -60,31 +60,38 @@ class DatabaseService {
           ["${playlistDocumentReference.id}_$playlistName"])
     });
   }
-  Future<String> createPlaylistGetId(String userName, String id, String playlistName) async {
-  DocumentReference playlistDocumentReference = await playlistCollection.add({
-    "playlistName": playlistName,
-    "playlistIcon": "",
-    "playlistOwner": "${id}_$userName",
-    "playlistId": "",  
-    "playlistSongs": "",
-    "playlistCreateTime": FieldValue.serverTimestamp(),
-  });
 
-  await playlistDocumentReference.update({
-    "playlistId": playlistDocumentReference.id,
-  });
+  Future<String> createPlaylistGetId(
+      String userName, String id, String playlistName) async {
+    DocumentReference playlistDocumentReference = await playlistCollection.add({
+      "playlistName": playlistName,
+      "playlistIcon": "",
+      "playlistOwner": "${id}_$userName",
+      "playlistId": "",
+      "playlistSongs": "",
+      "playlistCreateTime": FieldValue.serverTimestamp(),
+    });
 
-  DocumentReference userDocumentReference = userCollection.doc(id);
-  await userDocumentReference.update({
-    "playlist": FieldValue.arrayUnion(["${playlistDocumentReference.id}_$playlistName"]),
-  });
+    await playlistDocumentReference.update({
+      "playlistId": playlistDocumentReference.id,
+    });
 
-  return playlistDocumentReference.id;
-}
+    DocumentReference userDocumentReference = userCollection.doc(id);
+    await userDocumentReference.update({
+      "playlist": FieldValue.arrayUnion(
+          ["${playlistDocumentReference.id}_$playlistName"]),
+    });
+
+    return playlistDocumentReference.id;
+  }
 
   // getting the songs
   getSongs(String playlistId) async {
-    return playlistCollection.doc(playlistId).collection("songs").snapshots();
+    return playlistCollection
+        .doc(playlistId)
+        .collection("songs")
+        .orderBy('SongAddTime', descending: true)
+        .snapshots();
   }
 
   //getting the playlist owner
@@ -118,7 +125,7 @@ class DatabaseService {
   getPlaylists(String userId) async {
     return playlistCollection
         .where('playlistOwner', isEqualTo: userId)
-        //.orderBy('playlistCreateTime', descending: true)
+        .orderBy('playlistCreateTime', descending: true)
         .snapshots();
   }
 
@@ -153,7 +160,7 @@ class DatabaseService {
     playlistRef.collection('songs').doc(songId).delete();
   }
 
-  //like a song 
+  //like a song
   Future<void> updateIsLiked(String playlistId, String songId, bool isLiked,
       String userId, Map<String, dynamic> songData) async {
     CollectionReference songsCollectionn = FirebaseFirestore.instance
@@ -203,6 +210,7 @@ class DatabaseService {
         QuerySnapshot songsQuery = await playlistDoc.reference
             .collection('songs')
             .where('SongTrackId', isEqualTo: songData["SongTrackId"])
+            .orderBy('SongAddTime', descending: true)
             .get();
 
         if (songsQuery.size > 0) {
@@ -228,6 +236,9 @@ class DatabaseService {
 
     DocumentSnapshot playlistDoc = playlistQuery.docs.first;
 
-    return playlistDoc.reference.collection('songs').snapshots();
+    return playlistDoc.reference
+        .collection('songs')
+        .orderBy('SongAddTime', descending: true)
+        .snapshots();
   }
 }
