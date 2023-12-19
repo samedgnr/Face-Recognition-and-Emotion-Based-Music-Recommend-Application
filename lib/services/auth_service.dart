@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-
 import '../helper/helper_function.dart';
 import 'database_service.dart';
 
@@ -8,15 +7,8 @@ class AuthService {
 
   //login
   Future signInWithEmailandPassword(String email, String password) async {
-    try {
-      User user = (await FirebaseAuth.instance
-              .signInWithEmailAndPassword(email: email, password: password))
-          .user!;
-
-      return true;
-    } catch (e) {
-      return (e);
-    }
+    await FirebaseAuth.instance
+        .signInWithEmailAndPassword(email: email, password: password);
   }
 
   //register

@@ -4,6 +4,7 @@ import 'package:music_recommendation_with_emotional_analysiss/pages/library_page
 import 'package:music_recommendation_with_emotional_analysiss/pages/search_page.dart';
 import '../models/colors.dart' as custom_colors;
 
+// ignore: must_be_immutable
 class NavBar extends StatefulWidget {
   int finalindex;
 

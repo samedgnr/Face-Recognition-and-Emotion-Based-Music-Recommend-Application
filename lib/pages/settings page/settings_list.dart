@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
 import '../start page/main_page.dart';
-import '../../models/colors.dart' as custom_colors;
 
 class SettingsList extends StatelessWidget {
   const SettingsList({super.key});
