@@ -27,15 +27,28 @@ class _SearchPageState extends State<SearchPage> {
   String playlistName = "";
 
   Future<void> _search() async {
-    final response = await http.get(Uri.parse(
-        'http://10.0.2.2:5000/search?query=${_searchController.text}'));
+    setState(() {
+      isLoading = true;
+    });
 
-    if (response.statusCode == 200) {
+    try {
+      final response = await http.get(Uri.parse(
+          'http://10.0.2.2:5000/search?query=${_searchController.text}'));
+
+      if (response.statusCode == 200) {
+        setState(() {
+          searchResults = json.decode(response.body);
+        });
+      } else {
+        throw Exception('Failed to load search results');
+      }
+    } catch (e) {
+      print('Error searching for songs: $e');
+      // You can handle errors here
+    } finally {
       setState(() {
-        searchResults = json.decode(response.body);
+        isLoading = false;
       });
-    } else {
-      throw Exception('Failed to load search results');
     }
   }
 
@@ -97,162 +110,196 @@ class _SearchPageState extends State<SearchPage> {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 2),
-            Expanded(
-              child: ListView.builder(
-                itemCount: searchResults.length,
-                itemBuilder: (context, index) {
-                  final result = searchResults[index];
-                  String songDuration =
-                      '${result['duration_min'][0]}:${result['duration_min'][1].toString().padLeft(2, '0')}';
-                  Map<String, dynamic> songData = {
-                    "songName": result['name'],
-                    "songSinger": result['artists'][0],
-                    "songIcon": result['icon'],
-                    "songDuration": songDuration,
-                    "SongTrackId": result['id'],
-                    "SongAddTime": "",
-                    "songId": "",
-                    "songisLiked": false,
-                  };
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PlayMusicPage(
-                            songName: result['name'],
-                            songTrackId: result['id'],
-                          ),
-                        ),
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          top: 5, bottom: 1, left: 10, right: 10),
-                      child: ListTile(
-                        leading: ClipRRect(
-                          borderRadius: BorderRadius.circular(6),
-                          child: Image.network(
-                            result['icon'],
-                            width: 45,
-                          ),
-                        ),
-                        title: Text(
-                          result['name'],
-                          style: const TextStyle(color: Colors.black),
-                        ),
-                        subtitle: Text(
-                          '${result['artists'][0]} - ${result['duration_min'][0]}:${result['duration_min'][1].toString().padLeft(2, '0')}',
-                          style: const TextStyle(
-                              color: Color.fromARGB(77, 17, 16, 16)),
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            GestureDetector(
-                              onTapDown: (TapDownDetails details) {
-                                try {
-                                  showPopMenu(context, details.globalPosition,
-                                      playlist!, songData);
-                                } catch (e) {
-                                  Exception(e);
-                                }
-                              },
-                              child: const Icon(
-                                Icons.more_horiz,
-                                color: Colors.black,
+      body: isLoading
+          ? const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Searching for songs or artists...'),
+                ],
+              ),
+            )
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  const SizedBox(height: 2),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: searchResults.length,
+                      itemBuilder: (context, index) {
+                        final result = searchResults[index];
+                        String songDuration =
+                            '${result['duration_min'][0]}:${result['duration_min'][1].toString().padLeft(2, '0')}';
+                        Map<String, dynamic> songData = {
+                          "songName": result['name'],
+                          "songSinger": result['artists'][0],
+                          "songIcon": result['icon'],
+                          "songDuration": songDuration,
+                          "SongTrackId": result['id'],
+                          "SongAddTime": "",
+                          "songId": "",
+                          "songisLiked": false,
+                        };
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PlayMusicPage(
+                                  songName: result['name'],
+                                  songTrackId: result['id'],
+                                ),
+                              ),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                top: 5, bottom: 1, left: 10, right: 10),
+                            child: ListTile(
+                              leading: ClipRRect(
+                                borderRadius: BorderRadius.circular(6),
+                                child: Image.network(
+                                  result['icon'],
+                                  width: 45,
+                                ),
+                              ),
+                              title: Text(
+                                result['name'],
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                              subtitle: Text(
+                                '${result['artists'][0]} - ${result['duration_min'][0]}:${result['duration_min'][1].toString().padLeft(2, '0')}',
+                                style: const TextStyle(
+                                    color: Color.fromARGB(77, 17, 16, 16)),
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  GestureDetector(
+                                    onTapDown: (TapDownDetails details) {
+                                      try {
+                                        showPopMenu(
+                                            context,
+                                            details.globalPosition,
+                                            playlist!,
+                                            songData);
+                                      } catch (e) {
+                                        Exception(e);
+                                      }
+                                    },
+                                    child: const Icon(
+                                      Icons.more_horiz,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 
   popUpDialog(BuildContext context) {
     showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) {
-          return StatefulBuilder(builder: ((context, setState) {
-            return AlertDialog(
-              title: const Text(
-                "Create a playlist",
-                textAlign: TextAlign.left,
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    onChanged: (val) {
-                      setState(() {
-                        playlistName = val;
-                      });
-                    },
-                    style: const TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                            borderSide:
-                                const BorderSide(color: Colors.deepPurple),
-                            borderRadius: BorderRadius.circular(20)),
-                        errorBorder: OutlineInputBorder(
-                            borderSide:
-                                const BorderSide(color: Colors.deepPurple),
-                            borderRadius: BorderRadius.circular(20)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).primaryColor),
-                            borderRadius: BorderRadius.circular(20))),
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(builder: ((context, setState) {
+          return AlertDialog(
+            title: const Text(
+              "Create a playlist",
+              textAlign: TextAlign.left,
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  onChanged: (val) {
+                    setState(() {
+                      playlistName = val;
+                    });
+                  },
+                  style: const TextStyle(color: Colors.black),
+                  decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.deepPurple),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.deepPurple),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Theme.of(context).primaryColor),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                   ),
-                ],
-              ),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple),
-                  child: const Text("CANCEL"),
                 ),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (playlistName != "") {
-                      DatabaseService(
-                              uid: FirebaseAuth.instance.currentUser!.uid)
-                          .createPlaylist(
-                              userName,
-                              FirebaseAuth.instance.currentUser!.uid,
-                              playlistName);
-                      Navigator.of(context).pop();
-                      showTopSnackBar(
-                        Overlay.of(context),
-                        const CustomSnackBar.success(
-                            message: "Playlist created successfully."),
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple),
-                  child: const Text("CREATE"),
-                )
               ],
-            );
-          }));
-        });
+            ),
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: custom_colors.pinkPrimary,
+                ),
+                child: const Text(
+                  "CANCEL",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (playlistName != "") {
+                    DatabaseService(
+                      uid: FirebaseAuth.instance.currentUser!.uid,
+                    ).createPlaylist(
+                      userName,
+                      FirebaseAuth.instance.currentUser!.uid,
+                      playlistName,
+                    );
+                    Navigator.of(context).pop();
+                    showTopSnackBar(
+                      Overlay.of(context),
+                      const CustomSnackBar.success(
+                        message: "Playlist created successfully.",
+                      ),
+                    );
+                  } else {
+                    showTopSnackBar(
+                      Overlay.of(context),
+                      const CustomSnackBar.error(
+                        message: "Playist Name Can Not Be Emtpy",
+                      ),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: custom_colors.pinkPrimary,
+                ),
+                child: const Text(
+                  "CREATE",
+                  style: TextStyle(color: Colors.white),
+                ),
+              )
+            ],
+          );
+        }));
+      },
+    );
   }
 
   void showPopupMenu(BuildContext context, Offset offset,

@@ -72,7 +72,7 @@ class _PlayMusicPageState extends State<PlayMusicPage> {
         await PaletteGenerator.fromImageProvider(imageProvider);
     return paletteGenerator.dominantColor?.color;
   }
-
+//
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;

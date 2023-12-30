@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 
 class EmotionDetectionService {
   static const String baseUrl =
-      "http://10.0.2.2:5000"; // Update with your Flask server IP
+      "http://10.0.2.2:5000";
 
   static Future<Map<String, dynamic>> processImage(Uint8List imageBytes) async {
     String base64Image = base64Encode(imageBytes);

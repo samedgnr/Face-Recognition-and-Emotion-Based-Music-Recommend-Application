@@ -13,7 +13,10 @@ class TakePhoto extends StatefulWidget {
   final List<String> selectedArtist;
   final String selectedLanguage;
   const TakePhoto(
-      {super.key, required this.selectedGenres, required this.selectedArtist, required this.selectedLanguage});
+      {super.key,
+      required this.selectedGenres,
+      required this.selectedArtist,
+      required this.selectedLanguage});
 
   @override
   State<TakePhoto> createState() => _TakePhotoState();
@@ -23,6 +26,7 @@ class _TakePhotoState extends State<TakePhoto> {
   late Uint8List? imageBytes;
   String emotion = '';
   bool isImageSelected = false;
+  bool isProcessingRecommendations = false;
 
   List<String> emotionList = [
     'Happy',
@@ -70,18 +74,20 @@ class _TakePhotoState extends State<TakePhoto> {
     }
   }
 
-  void getRecommendations(List<String> artist, List<String> genre,String language) async {
+  void getRecommendations(
+      List<String> artist, List<String> genre, String language) async {
     try {
-      List<String> artists = artist;
-      List<String> genres = genre;
+      setState(() {
+        isProcessingRecommendations = true;
+      });
 
       await processImage();
 
       Map<String, dynamic> result =
           await EmotionDetectionService.getRecommendations(
         emotion,
-        genres,
-        artists,
+        genre,
+        artist,
         language,
       );
 
@@ -100,6 +106,10 @@ class _TakePhotoState extends State<TakePhoto> {
       }
     } catch (e) {
       print('Error getting recommendations: $e');
+    } finally {
+      setState(() {
+        isProcessingRecommendations = false;
+      });
     }
   }
 
@@ -123,65 +133,84 @@ class _TakePhotoState extends State<TakePhoto> {
           child: Container(),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const SizedBox(height: 10),
-              Text(
-                'Son olarak fotoğrafını çekelim! ',
-                style: TextStyle(
-                  fontSize: 24,
-                  color: custom_colors.pinkPrimary,
-                  fontWeight: FontWeight.bold,
+      body: FutureBuilder(
+          future: Future.delayed(
+              Duration(seconds: 0)), 
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting ||
+                isProcessingRecommendations) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('Analyzing recommendations...'),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 30),
-              Center(
-                child: SizedBox(
-                  height: 150,
-                  width: 150,
-                  child: FloatingActionButton(
-                    heroTag: 'adsaa',
-                    onPressed: () async {
-                      await getImage();
-                    },
-                    backgroundColor: custom_colors.pinkPrimary,
-                    child: const Icon(
-                      Icons.camera_alt,
-                      size: 70,
-                      color: Colors.white,
-                    ),
+              );
+            } else {
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      const SizedBox(height: 10),
+                      Text(
+                        'Son olarak fotoğrafını çekelim! ',
+                        style: TextStyle(
+                          fontSize: 24,
+                          color: custom_colors.pinkPrimary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      Center(
+                        child: SizedBox(
+                          height: 150,
+                          width: 150,
+                          child: FloatingActionButton(
+                            heroTag: 'adsaa',
+                            onPressed: () async {
+                              await getImage();
+                            },
+                            backgroundColor: custom_colors.pinkPrimary,
+                            child: const Icon(
+                              Icons.camera_alt,
+                              size: 70,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      Text(
+                        'Fotoğraf çekmek istemiyorsan aşağıdan istediğin duygu durumunu da seçebilirsin!',
+                        style: TextStyle(
+                          fontSize: 24,
+                          color: custom_colors.pinkPrimary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        height: 230,
+                        child: Center(
+                          child: ListView.builder(
+                            itemCount: emotionList.length,
+                            itemBuilder: (context, index) {
+                              return buildEmotionButton(emotionList[index]);
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 30),
-              Text(
-                'Fotoğraf çekmek istemiyorsan aşağıdan istediğin duygu durumunu da seçebilirsin!',
-                style: TextStyle(
-                  fontSize: 24,
-                  color: custom_colors.pinkPrimary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 230,
-                child: Center(
-                  child: ListView.builder(
-                    itemCount: emotionList.length,
-                    itemBuilder: (context, index) {
-                      return buildEmotionButton(emotionList[index]);
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+              );
+            }
+          }),
       floatingActionButton: Padding(
         padding: const EdgeInsets.fromLTRB(28, 16, 8, 16),
         child: Row(
@@ -221,15 +250,16 @@ class _TakePhotoState extends State<TakePhoto> {
                   onPressed: emotion != "" || isImageSelected
                       ? () {
                           print(emotion);
-                          getRecommendations(
-                              widget.selectedArtist, widget.selectedGenres,widget.selectedLanguage);
+                          getRecommendations(widget.selectedArtist,
+                              widget.selectedGenres, widget.selectedLanguage);
                         }
                       : () {
                           print(emotion);
                           showTopSnackBar(
                             Overlay.of(context),
                             const CustomSnackBar.error(
-                                message: "Do not forget to take a photo!"),
+                                message:
+                                    "Do not forget to state your emotion!"),
                           );
                         },
                   child: const Row(

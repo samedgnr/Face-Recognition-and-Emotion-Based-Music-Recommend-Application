@@ -18,6 +18,7 @@ class PlaylistPage extends StatefulWidget {
 
 class _PlaylistScreenState extends State<PlaylistPage> {
   String playlistName = "";
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -30,6 +31,7 @@ class _PlaylistScreenState extends State<PlaylistPage> {
       DatabaseService().getPlaylistName(widget.playlistId).then((value) {
         setState(() {
           playlistName = value;
+          isLoading = false;
         });
       });
     } catch (e) {
@@ -39,81 +41,109 @@ class _PlaylistScreenState extends State<PlaylistPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            custom_colors.pinkPrimary.withOpacity(0.8),
-            const Color.fromARGB(255, 163, 137, 211).withOpacity(0.8),
-          ],
-        ),
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          title: Text(
-            playlistName,
-            style: const TextStyle(color: Colors.white),
-          ),
-          actions: [
-            IconButton(
-                onPressed: () {
-                  showDialog(
-                      barrierDismissible: false,
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: const Text("Delete"),
-                          content: const Text(
-                              "Are you sure you delete the playlist? "),
-                          actions: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              icon: Icon(
-                                Icons.cancel,
-                                color: custom_colors.pinkPrimary,
-                              ),
+    return  Container(
+  decoration: BoxDecoration(
+    gradient: LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [
+        custom_colors.pinkPrimary.withOpacity(0.8),
+        const Color.fromARGB(255, 163, 137, 211).withOpacity(0.8),
+      ],
+    ),
+  ),
+  child: isLoading
+    ? const Center(
+        child: CircularProgressIndicator(),
+      )
+    : Scaffold(
+              backgroundColor: Colors.transparent,
+              appBar: AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                title: Text(
+                  playlistName,
+                  style: const TextStyle(color: Colors.white),
+                ),
+                actions: [
+                  IconButton(
+                      onPressed: () {
+                        showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text("Delete"),
+                                content: const Text(
+                                    "Are you sure you delete the playlist? "),
+                                actions: [
+                                  IconButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    icon: Icon(
+                                      Icons.cancel,
+                                      color: custom_colors.pinkPrimary,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () async {
+                                      DatabaseService()
+                                          .deletePlaylist(widget.playlistId);
+                                      Navigator.pop(context);
+                                      Navigator.pop(context);
+                                    },
+                                    icon: Icon(
+                                      Icons.done,
+                                      color: custom_colors.pinkPrimary,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            });
+                      },
+                      icon: const Icon(Icons.exit_to_app))
+                ],
+                iconTheme: const IconThemeData(color: Colors.white),
+              ),
+              body: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    children: [
+                      Column(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(15.0),
+                            child: Image.network(
+                              "https://community.spotify.com/t5/image/serverpage/image-id/25294i2836BD1C1A31BDF2/image-size/original?v=mpbl-1&px=-1",
+                              height: MediaQuery.of(context).size.height * 0.3,
+                              width: MediaQuery.of(context).size.height * 0.3,
+                              fit: BoxFit.cover,
                             ),
-                            IconButton(
-                              onPressed: () async {
-                                DatabaseService()
-                                    .deletePlaylist(widget.playlistId);
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                              },
-                              icon: Icon(
-                                Icons.done,
-                                color: custom_colors.pinkPrimary,
-                              ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Text(
+                            playlistName,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 25,
                             ),
-                          ],
-                        );
-                      });
-                },
-                icon: const Icon(Icons.exit_to_app))
-          ],
-          iconTheme: const IconThemeData(color: Colors.white),
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              children: [
-                _PlaylistInformation(playlistName: playlistName),
-                const SizedBox(height: 10),
-                _PlaylistSongs(playlistId: widget.playlistId),
-              ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      _PlaylistSongs(playlistId: widget.playlistId),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
-    );
+);
+     
+            
   }
 }
 
@@ -135,6 +165,7 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
   Stream<QuerySnapshot>? playlist;
   Stream<QuerySnapshot>? songs;
   String userId = "";
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -165,11 +196,12 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
     }
   }
 
-  getSongs() {
+  getSongs() async {
     try {
-      DatabaseService().getSongs(widget.playlistId).then((value) {
+      await DatabaseService().getSongs(widget.playlistId).then((value) {
         setState(() {
           songs = value;
+          isLoading = false;
         });
       });
     } catch (e) {
@@ -182,6 +214,26 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
     return StreamBuilder<QuerySnapshot>(
       stream: songs,
       builder: (context, AsyncSnapshot snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        if (!isLoading && (!snapshot.hasData || snapshot.data.docs.isEmpty)) {
+          return const Center(child: Text("Müzik ekleyin."));
+        }
+        if (isLoading && (!snapshot.hasData || snapshot.data.docs.isEmpty)) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Center(
+            child: Text('Veri alınamadı: ${snapshot.error}'),
+          );
+        }
+
         return ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -279,75 +331,95 @@ class _PlaylistSongsState extends State<_PlaylistSongs> {
 
   popUpDialog(BuildContext context) {
     showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) {
-          return StatefulBuilder(builder: ((context, setState) {
-            return AlertDialog(
-              title: const Text(
-                "Create a playlist",
-                textAlign: TextAlign.left,
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    onChanged: (val) {
-                      setState(() {
-                        playlistName = val;
-                      });
-                    },
-                    style: const TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: custom_colors.buttonColor),
-                            borderRadius: BorderRadius.circular(20)),
-                        errorBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: custom_colors.buttonColor),
-                            borderRadius: BorderRadius.circular(20)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).primaryColor),
-                            borderRadius: BorderRadius.circular(20))),
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(builder: ((context, setState) {
+          return AlertDialog(
+            title: const Text(
+              "Create a playlist",
+              textAlign: TextAlign.left,
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  onChanged: (val) {
+                    setState(() {
+                      playlistName = val;
+                    });
+                  },
+                  style: const TextStyle(color: Colors.black),
+                  decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.deepPurple),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.deepPurple),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Theme.of(context).primaryColor),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                   ),
-                ],
-              ),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: custom_colors.buttonColor),
-                  child: const Text("CANCEL"),
                 ),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (playlistName != "") {
-                      DatabaseService(
-                              uid: FirebaseAuth.instance.currentUser!.uid)
-                          .createPlaylist(
-                              userName,
-                              FirebaseAuth.instance.currentUser!.uid,
-                              playlistName);
-                      Navigator.of(context).pop();
-                      showTopSnackBar(
-                        Overlay.of(context),
-                        const CustomSnackBar.info(
-                            message: "Playlist created successfully."),
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: custom_colors.buttonColor),
-                  child: const Text("CREATE"),
-                )
               ],
-            );
-          }));
-        });
+            ),
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: custom_colors.pinkPrimary,
+                ),
+                child: const Text(
+                  "CANCEL",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (playlistName != "") {
+                    DatabaseService(
+                      uid: FirebaseAuth.instance.currentUser!.uid,
+                    ).createPlaylist(
+                      userName,
+                      FirebaseAuth.instance.currentUser!.uid,
+                      playlistName,
+                    );
+                    Navigator.of(context).pop();
+                    showTopSnackBar(
+                      Overlay.of(context),
+                      const CustomSnackBar.success(
+                        message: "Playlist created successfully.",
+                      ),
+                    );
+                  } else {
+                    showTopSnackBar(
+                      Overlay.of(context),
+                      const CustomSnackBar.error(
+                        message: "Playist Name Can Not Be Emtpy",
+                      ),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: custom_colors.pinkPrimary,
+                ),
+                child: const Text(
+                  "CREATE",
+                  style: TextStyle(color: Colors.white),
+                ),
+              )
+            ],
+          );
+        }));
+      },
+    );
   }
 
   void showPopupMenu(BuildContext context, Offset offset,

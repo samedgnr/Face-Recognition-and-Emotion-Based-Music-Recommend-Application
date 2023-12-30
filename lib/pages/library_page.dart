@@ -22,11 +22,11 @@ class _MyPlaylistPageState extends State<MyPlaylistsPage> {
   String userId = "";
   String playlistName = "";
   List<Map<String, dynamic>> playlistList = [];
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-
     gettingUserData();
   }
 
@@ -37,7 +37,6 @@ class _MyPlaylistPageState extends State<MyPlaylistsPage> {
         userId = "${FirebaseAuth.instance.currentUser!.uid}_$userName";
       });
       await gettingPlaylist();
-      //await streamtoList();
     });
   }
 
@@ -46,6 +45,7 @@ class _MyPlaylistPageState extends State<MyPlaylistsPage> {
       DatabaseService().getPlaylists(userId).then((value) async {
         setState(() {
           playlist = value;
+          isLoading = false;
         });
       });
     } catch (e) {
@@ -53,91 +53,97 @@ class _MyPlaylistPageState extends State<MyPlaylistsPage> {
     }
   }
 
-//   streamtoList() async {
-//   try {
-//     playlistList.clear();
-
-//     await playlist!.forEach((snapshot) {
-//       for (QueryDocumentSnapshot doc in snapshot.docs) {
-//         playlistList.add(doc.data() as Map<String, dynamic>);
-//       }
-//     });
-//   } catch (e) {
-//     print("Hata oluştu: $e");
-//   }
-// }
-
   popUpDialog(BuildContext context) {
     showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) {
-          return StatefulBuilder(builder: ((context, setState) {
-            return AlertDialog(
-              title: const Text(
-                "Create a playlist",
-                textAlign: TextAlign.left,
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    onChanged: (val) {
-                      setState(() {
-                        playlistName = val;
-                      });
-                    },
-                    style: const TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                            borderSide:
-                                const BorderSide(color: Colors.deepPurple),
-                            borderRadius: BorderRadius.circular(20)),
-                        errorBorder: OutlineInputBorder(
-                            borderSide:
-                                const BorderSide(color: Colors.deepPurple),
-                            borderRadius: BorderRadius.circular(20)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).primaryColor),
-                            borderRadius: BorderRadius.circular(20))),
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(builder: ((context, setState) {
+          return AlertDialog(
+            title: const Text(
+              "Create a playlist",
+              textAlign: TextAlign.left,
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  onChanged: (val) {
+                    setState(() {
+                      playlistName = val;
+                    });
+                  },
+                  style: const TextStyle(color: Colors.black),
+                  decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.deepPurple),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.deepPurple),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Theme.of(context).primaryColor),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                   ),
-                ],
-              ),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple),
-                  child: const Text("CANCEL"),
                 ),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (playlistName != "") {
-                      DatabaseService(
-                              uid: FirebaseAuth.instance.currentUser!.uid)
-                          .createPlaylist(
-                              userName,
-                              FirebaseAuth.instance.currentUser!.uid,
-                              playlistName);
-                      Navigator.of(context).pop();
-                      showTopSnackBar(
-                          Overlay.of(context),
-                          const CustomSnackBar.success(
-                              message: "Playlist created successfully."),
-                        );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple),
-                  child: const Text("CREATE"),
-                )
               ],
-            );
-          }));
-        });
+            ),
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: custom_colors.pinkPrimary,
+                ),
+                child: const Text(
+                  "CANCEL",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (playlistName != "") {
+                    DatabaseService(
+                      uid: FirebaseAuth.instance.currentUser!.uid,
+                    ).createPlaylist(
+                      userName,
+                      FirebaseAuth.instance.currentUser!.uid,
+                      playlistName,
+                    );
+                    Navigator.of(context).pop();
+                    showTopSnackBar(
+                      Overlay.of(context),
+                      const CustomSnackBar.success(
+                        message: "Playlist created successfully.",
+                      ),
+                    );
+                  } else {
+                    showTopSnackBar(
+                      Overlay.of(context),
+                      const CustomSnackBar.error(
+                        message: "Playist Name Can Not Be Emtpy",
+                      ),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: custom_colors.pinkPrimary,
+                ),
+                child: const Text(
+                  "CREATE",
+                  style: TextStyle(color: Colors.white),
+                ),
+              )
+            ],
+          );
+        }));
+      },
+    );
   }
 
   String getAfterUnderscore(String playlistOwner) {
@@ -190,19 +196,23 @@ class _MyPlaylistPageState extends State<MyPlaylistsPage> {
       body: StreamBuilder<QuerySnapshot>(
         stream: playlist,
         builder: (context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          if (!snapshot.hasData || snapshot.data.docs.isEmpty) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
           if (snapshot.hasError) {
             return Center(
               child: Text('Veri alınamadı: ${snapshot.error}'),
             );
           }
 
-          if (!snapshot.hasData || snapshot.data.docs.isEmpty) {
-            return const Center(
-              child: Text('Veri bulunamadı.'),
-            );
-          }
-
-          playlistList.clear(); 
+          playlistList.clear();
 
           snapshot.data!.docs.forEach((doc) {
             playlistList.add(doc.data() as Map<String, dynamic>);

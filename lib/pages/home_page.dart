@@ -577,13 +577,13 @@ class _HomePageState extends State<HomePage> {
                             child: ElevatedButton.icon(
                               onPressed: () async {
                                 try {
-                                  Map<String, dynamic> result =
+                                  Map<String, dynamic> result = 
                                       await EmotionDetectionService
                                           .getRecommendations(
                                     "Neutral",
                                     ["rock"],
-                                    ["duman"],
-                                    "turkish",
+                                    ["tame impala"],
+                                    "english",
                                   );
 
                                   if (result.isNotEmpty) {
@@ -694,7 +694,7 @@ class _HomePageState extends State<HomePage> {
                                           .getRecommendations(
                                     "Sad",
                                     ["rock"],
-                                    ["dire straits"],
+                                    ["duman"],
                                     "turkish",
                                   );
 

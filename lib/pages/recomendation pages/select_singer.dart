@@ -277,82 +277,116 @@ class _SelectSingerState extends State<SelectSinger> {
             ),
           ),
           Expanded(
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 4.0,
-                mainAxisSpacing: 4.0,
-              ),
-              itemCount: singerList.length,
-              itemBuilder: (context, index) {
-                var singer = singerList[index];
-                bool isSelected = selectedArtists.contains(singer['name']);
-
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      if (isSelected) {
-                        selectedArtists.remove(singer['name']);
-                      } else {
-                        if (selectedArtists.length >= 4) {
-                          showTopSnackBar(
-                            Overlay.of(context),
-                            const CustomSnackBar.error(
-                              message: "higher than 4 singer can not be added",
-                            ),
-                          );
-                        } else {
-                          selectedArtists.add(singer['name']);
-                          print(selectedArtists);
-                        }
-                      }
-                    });
-                  },
-                  child: Card(
-                    color: isSelected ? Colors.green : null,
+            child: FutureBuilder(
+              future: Future.delayed(Duration(seconds: 0)),
+              builder: (context, snapshot) {
+                if (singerList.isEmpty) {
+                  return Center(
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const SizedBox(height: 6),
-                        CircleAvatar(
-                          backgroundImage: NetworkImage(singer['icon']),
-                        ),
-                        const SizedBox(height: 4),
+                        const CircularProgressIndicator(),
+                        const SizedBox(height: 16),
                         Text(
-                          singer['name'],
+                          'Şarkıcılar bulunuyor...',
                           style: TextStyle(
+                            color: custom_colors.pinkPrimary,
                             fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: isSelected
-                                ? Colors.white
-                                : custom_colors.pinkPrimary,
                           ),
                         ),
-                        const SizedBox(height: 2),
-                        RichText(
-                          text: TextSpan(
-                            style: const TextStyle(
-                                fontSize: 12, color: Colors.black),
+                      ],
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text('Error: ${snapshot.error}'),
+                  );
+                } else {
+                  return GridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 4.0,
+                      mainAxisSpacing: 4.0,
+                    ),
+                    itemCount: singerList.length,
+                    itemBuilder: (context, index) {
+                      var singer = singerList[index];
+                      bool isSelected =
+                          selectedArtists.contains(singer['name']);
+
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            if (isSelected) {
+                              selectedArtists.remove(singer['name']);
+                            } else {
+                              if (selectedArtists.length >= 4) {
+                                showTopSnackBar(
+                                  Overlay.of(context),
+                                  const CustomSnackBar.error(
+                                    message:
+                                        "higher than 4 singer can not be added",
+                                  ),
+                                );
+                              } else {
+                                selectedArtists.add(singer['name']);
+                                print(selectedArtists);
+                              }
+                            }
+                          });
+                        },
+                        child: Card(
+                          color: isSelected ? Colors.green : null,
+                          child: Column(
                             children: [
-                              TextSpan(
-                                text: formatFollowers(singer['followers']),
+                              const SizedBox(height: 6),
+                              CircleAvatar(
+                                backgroundImage: NetworkImage(singer['icon']),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                singer['name'],
                                 style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
                                   color: isSelected
                                       ? Colors.white
                                       : custom_colors.pinkPrimary,
-                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const TextSpan(
-                                text: ' Followers',
-                                style: TextStyle(color: Colors.black),
-                              ),
+                              const SizedBox(height: 2),
+                              RichText(
+                                text: TextSpan(
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text:
+                                          formatFollowers(singer['followers']),
+                                      style: TextStyle(
+                                        color: isSelected
+                                            ? Colors.white
+                                            : custom_colors.pinkPrimary,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const TextSpan(
+                                      text: ' Followers',
+                                      style: TextStyle(color: Colors.black),
+                                    ),
+                                  ],
+                                ),
+                              )
                             ],
                           ),
-                        )
-                      ],
-                    ),
-                  ),
-                );
+                        ),
+                      );
+                    },
+                  );
+                }
               },
             ),
           ),
